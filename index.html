@@ -3,358 +3,374 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cierre Diario Rent-A-Car (Avanzado)</title>
+    <title>Sistema de Cierre | Rent a Car</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
-        /* Estilos CSS Base */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #e8f5e9; /* Fondo suave para el tema */
+        :root {
+            --primary-color: #2563eb;
+            --bg-color: #f3f4f6;
         }
-        .container {
-            max-width: 700px;
-            margin: auto;
-            background: #ffffff;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        body { background-color: var(--bg-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        .header-bar {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
         }
-        h1, h2 {
-            color: #004d40;
-            border-bottom: 2px solid #b2dfdb;
-            padding-bottom: 5px;
-            margin-top: 20px;
+        
+        .custom-card {
+            background: white;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.2s;
         }
-        input[type="text"], input[type="time"] {
-            width: 98%;
-            padding: 10px;
-            margin-top: 4px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+        
+        .nav-pills .nav-link.active {
+            background-color: var(--primary-color);
+            border-radius: 50px;
         }
-        /* Estilo para cada tarea en la lista */
-        .tarea-item {
+        
+        .nav-pills .nav-link {
+            color: #4b5563;
+            font-weight: 600;
+            margin: 0 5px;
+            border-radius: 50px;
+        }
+
+        .check-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
-            padding: 12px;
-            background: #f1f8e9;
-            border-radius: 5px;
-            border-left: 5px solid #4caf50;
         }
-        .tarea-item input[type="checkbox"] {
-            margin-right: 15px;
-            width: 20px; 
-            height: 20px;
-            flex-shrink: 0;
+        
+        .check-item:last-child { border-bottom: none; }
+        
+        .status-badge {
+            font-size: 0.8em;
+            padding: 5px 10px;
+            border-radius: 20px;
         }
-        .tarea-label {
-            flex-grow: 1;
-            font-weight: bold;
-            color: #388e3c;
-        }
-        /* Estilos para adjuntar archivos */
-        .adjunto-input {
-            display: none; /* Ocultar el input original */
-        }
-        .adjunto-label {
-            background-color: #00796b;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-left: 15px;
-            font-size: 0.9em;
-            transition: background-color 0.3s;
-        }
-        .adjunto-label:hover {
-            background-color: #004d40;
-        }
-        .adjunto-label.file-attached {
-            background-color: #fbc02d; /* Amarillo para indicar que ya hay un archivo */
-        }
-        /* Estilo para la firma */
-        #signatureCanvas {
-            border: 2px solid #004d40;
-            border-radius: 5px;
-            touch-action: none;
-            background: #fff;
-            width: 100%;
-            max-width: 560px; /* Ancho máximo para mejor visualización */
-            height: 150px;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1.1em;
-            margin-top: 15px;
-            transition: background-color 0.3s;
-        }
-        #btnGuardar {
-            background-color: #2e7d32; /* Verde fuerte */
-        }
-        #btnGuardar:hover {
-            background-color: #1b5e20;
-        }
-        #limpiarFirma {
-            background-color: #d32f2f;
-            width: 48%;
-            display: inline-block;
-            margin-right: 2%;
-        }
-        #limpiarFirma:hover {
-             background-color: #b71c1c;
+
+        /* Loading Overlay */
+        #loadingOverlay {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.9);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>📝 Cierre Diario Rent-A-Car</h1>
-    <p>Complete las tareas, adjunte la evidencia fotográfica y firme para finalizar el turno.</p>
+<div id="loadingOverlay">
+    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
+    <h5 class="mt-3 text-secondary">Procesando y subiendo foto...</h5>
+</div>
 
-    <form id="checklistForm">
-
-        <h2>Información del Cierre</h2>
-        <label for="responsable">Responsable del Cierre:</label>
-        <input type="text" id="responsable" required placeholder="Nombre Completo">
-        
-        <label for="horaCierre">Hora de Cierre:</label>
-        <input type="time" id="horaCierre" required>
-        
-        <label>Fecha:</label>
-        <input type="text" id="fechaCierre" readonly>
-        
-        <h2>Tareas y Evidencia Fotográfica</h2>
-
-        <div class="tarea-item">
-            <input type="checkbox" id="t1" name="tarea" value="Pitbull a las unidades">
-            <label for="t1" class="tarea-label">1. Pitbull a las unidades</label>
-            <input type="file" id="img_t1" accept="image/*" class="adjunto-input" data-label-id="lbl_t1">
-            <label for="img_t1" class="adjunto-label" id="lbl_t1">Adjuntar Foto</label>
-        </div>
-        
-        <div class="tarea-item">
-            <input type="checkbox" id="t2" name="tarea" value="Chequeo unidades cerradas">
-            <label for="t2" class="tarea-label">2. Chequeo que las unidades estén cerradas</label>
-            <input type="file" id="img_t2" accept="image/*" class="adjunto-input" data-label-id="lbl_t2">
-            <label for="img_t2" class="adjunto-label" id="lbl_t2">Adjuntar Foto</label>
-        </div>
-
-        <div class="tarea-item">
-            <input type="checkbox" id="t3" name="tarea" value="Candados de las bodegas estén cerrados">
-            <label for="t3" class="tarea-label">3. Chequeo de candados de las bodegas</label>
-            <input type="file" id="img_t3" accept="image/*" class="adjunto-input" data-label-id="lbl_t3">
-            <label for="img_t3" class="adjunto-label" id="lbl_t3">Adjuntar Foto</label>
-        </div>
-
-        <div class="tarea-item">
-            <input type="checkbox" id="t4" name="tarea" value="Candado de la estación de combustible cerrado">
-            <label for="t4" class="tarea-label">4. Chequeo candado de la estación de combustible</label>
-            <input type="file" id="img_t4" accept="image/*" class="adjunto-input" data-label-id="lbl_t4">
-            <label for="img_t4" class="adjunto-label" id="lbl_t4">Adjuntar Foto</label>
-        </div>
-
-        <div class="tarea-item">
-            <input type="checkbox" id="t5" name="tarea" value="Chequeo de la basura del lavado">
-            <label for="t5" class="tarea-label">5. Chequeo de la basura del lavado</label>
-            <input type="file" id="img_t5" accept="image/*" class="adjunto-input" data-label-id="lbl_t5">
-            <label for="img_t5" class="adjunto-label" id="lbl_t5">Adjuntar Foto</label>
-        </div>
-        
-        <h2>Firma de Conformidad</h2>
-        <p>Por favor, firme en el recuadro con su dedo o el mouse.</p>
-        <canvas id="signatureCanvas" width="560" height="150"></canvas><br>
-        <button type="button" id="limpiarFirma" onclick="limpiarFirma()">Limpiar Firma</button>
-        <button type="button" id="btnGuardar" onclick="prepararYEnviarDatos()">
-            Guardar Registro en la Nube (Simulado)
-        </button>
-    </form>
-    
-    <div id="estadisticas" style="margin-top: 40px;">
-        <h2>📊 Estadísticas de Cumplimiento (Pendiente)</h2>
-        <p>Aquí se cargará el gráfico de Chart.js mostrando los días con/sin cierre una vez que haya datos guardados y el sistema de lectura esté implementado.</p>
+<div class="header-bar text-center">
+    <div class="container">
+        <h2 class="m-0"><i class="fa-solid fa-car-side me-2"></i>Control de Cierre</h2>
+        <small>Gestión de Seguridad y Patio</small>
     </div>
+</div>
 
+<div class="container pb-5">
+    
+    <ul class="nav nav-pills nav-fill mb-4 justify-content-center" id="pills-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#tab-registro" type="button"><i class="fa-solid fa-list-check me-2"></i>Nuevo Registro</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#tab-stats" type="button" onclick="cargarEstadisticas()"><i class="fa-solid fa-chart-pie me-2"></i>Estadísticas</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="pills-tabContent">
+        
+        <div class="tab-pane fade show active" id="tab-registro" role="tabpanel">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <form id="formularioCierre">
+                        <div class="custom-card p-4">
+                            <h5 class="mb-4 text-secondary">📝 Datos Generales</h5>
+                            
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="responsable" placeholder="Nombre" required>
+                                <label for="responsable">Nombre del Responsable</label>
+                            </div>
+
+                            <h5 class="mt-4 mb-3 text-secondary">🛡️ Seguridad y Patio</h5>
+                            
+                            <div class="check-item">
+                                <label class="form-check-label" for="pitbull"><i class="fa-solid fa-lock me-2 text-warning"></i> Pitbull en unidades</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="pitbull">
+                                </div>
+                            </div>
+                            
+                            <div class="check-item">
+                                <label class="form-check-label" for="unidades"><i class="fa-solid fa-car me-2 text-primary"></i> Unidades cerradas</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="unidades">
+                                </div>
+                            </div>
+
+                            <div class="check-item">
+                                <label class="form-check-label" for="bodegas"><i class="fa-solid fa-warehouse me-2 text-secondary"></i> Candados Bodega</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="bodegas">
+                                </div>
+                            </div>
+
+                            <div class="check-item">
+                                <label class="form-check-label" for="combustible"><i class="fa-solid fa-gas-pump me-2 text-danger"></i> Estación Combustible</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="combustible">
+                                </div>
+                            </div>
+
+                            <div class="check-item">
+                                <label class="form-check-label" for="basura"><i class="fa-solid fa-trash me-2 text-dark"></i> Basura Lavado</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="basura">
+                                </div>
+                            </div>
+
+                             <div class="check-item">
+                                <label class="form-check-label" for="patio"><i class="fa-solid fa-broom me-2 text-success"></i> Patio Ordenado</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="patio">
+                                </div>
+                            </div>
+
+                            <h5 class="mt-4 mb-3 text-secondary">📷 Evidencia Fotográfica</h5>
+                            <div class="mb-3">
+                                <input class="form-control" type="file" id="fotoEvidencia" accept="image/*">
+                                <div class="form-text">Sube una foto general del patio (Opcional)</div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 py-3 mt-3 fw-bold shadow">
+                                <i class="fa-solid fa-paper-plane me-2"></i> ENVIAR INFORME
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-stats" role="tabpanel">
+            <div class="row">
+                <div class="col-md-12 mb-4">
+                    <div class="custom-card p-4">
+                        <h5 class="text-center text-secondary mb-3">Cumplimiento Semanal</h5>
+                        <div style="height: 250px;">
+                            <canvas id="graficoCierres"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="custom-card p-4">
+                        <h5 class="mb-3 text-secondary">Historial Reciente</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle" id="tablaLogs">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Responsable</th>
+                                        <th>Evidencia</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="4" class="text-center">Cargando datos...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-    document.getElementById('fechaCierre').value = new Date().toLocaleDateString('es-ES', { 
-        year: 'numeric', month: 'long', day: 'numeric' 
-    });
+    // ==========================================
+    // ⚠️ PEGA AQUÍ TU URL DE GOOGLE APPS SCRIPT
+    // ==========================================
+    const URL_SCRIPT = "AQUÍ_TU_URL_DE_GOOGLE_APPS_SCRIPT"; 
 
-    // --- LÓGICA DE LA FIRMA (Canvas) ---
-    const canvas = document.getElementById('signatureCanvas');
-    const ctx = canvas.getContext('2d');
-    let drawing = false;
-
-    // Configuración del lápiz
-    ctx.lineWidth = 3;
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = '#000';
-
-    function getMousePos(e) {
-        const rect = canvas.getBoundingClientRect();
-        let clientX, clientY;
-
-        if (e.touches && e.touches.length > 0) {
-            clientX = e.touches[0].clientX;
-            clientY = e.touches[0].clientY;
-        } else {
-            clientX = e.clientX;
-            clientY = e.clientY;
-        }
-        return {
-            x: clientX - rect.left,
-            y: clientY - rect.top
-        };
-    }
-
-    function startPosition(e) {
-        drawing = true;
-        ctx.beginPath();
-        const pos = getMousePos(e);
-        ctx.moveTo(pos.x, pos.y);
-        e.preventDefault(); 
-    }
-
-    function endPosition() {
-        drawing = false;
-    }
-
-    function draw(e) {
-        if (!drawing) return;
-        const pos = getMousePos(e);
-        ctx.lineTo(pos.x, pos.y);
-        ctx.stroke();
-        e.preventDefault(); 
-    }
-
-    // Event Listeners para Mouse y Touch
-    canvas.addEventListener('mousedown', startPosition);
-    canvas.addEventListener('mouseup', endPosition);
-    canvas.addEventListener('mouseout', endPosition);
-    canvas.addEventListener('mousemove', draw);
-
-    canvas.addEventListener('touchstart', startPosition);
-    canvas.addEventListener('touchend', endPosition);
-    canvas.addEventListener('touchcancel', endPosition);
-    canvas.addEventListener('touchmove', draw);
-
-    function limpiarFirma() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-    
-    // Almacén global para las imágenes Base64
-    const imagenesBase64 = {};
-
-    // --- LÓGICA DE ADJUNTAR IMAGEN Y CONVERTIR A BASE64 ---
-
-    document.querySelectorAll('.adjunto-input').forEach(input => {
-        input.addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            const reader = new FileReader();
-            const taskId = this.id;
-            const labelId = this.dataset.labelId;
-            const label = document.getElementById(labelId);
-
-            if (file) {
-                // Validación simple de tamaño (1MB)
-                if (file.size > 1024 * 1024) { 
-                    alert('El archivo es demasiado grande (Máx 1MB). Por favor, comprima la imagen.');
-                    this.value = ''; // Limpiar el input
-                    return;
-                }
-
-                reader.onload = function(e) {
-                    // Guardar la imagen Base64
-                    imagenesBase64[taskId] = e.target.result; 
-                    
-                    // Actualizar el label para mostrar que hay un archivo adjunto
-                    label.textContent = '✔️ Foto Adjunta';
-                    label.classList.add('file-attached');
-                };
-                reader.readAsDataURL(file);
-            } else {
-                delete imagenesBase64[taskId];
-                label.textContent = 'Adjuntar Foto';
-                label.classList.remove('file-attached');
-            }
-        });
-    });
-
-    // --- LÓGICA DE RECOPILACIÓN Y ENVÍO DE DATOS ---
-
-    function prepararYEnviarDatos() {
-        const responsable = document.getElementById('responsable').value;
-        const horaCierre = document.getElementById('horaCierre').value;
-        const fechaCierre = document.getElementById('fechaCierre').value;
-
-        if (!responsable || !horaCierre) {
-            alert('❌ Por favor, complete el nombre del responsable y la hora de cierre.');
+    // Función principal de envío
+    document.getElementById('formularioCierre').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Validar URL
+        if(URL_SCRIPT.includes("AQUÍ_TU_URL")) {
+            alert("⚠️ Error: No has configurado la URL del script en el código HTML.");
             return;
         }
 
-        // 1. Recoger las tareas
-        const tareasChecked = Array.from(document.querySelectorAll('input[name="tarea"]:checked'));
-        const registroTareas = tareasChecked.map(cb => {
-            const taskId = cb.id;
-            return {
-                tarea: cb.value,
-                completada: true,
-                evidencia: imagenesBase64[`img_${taskId}`] || null // Adjuntar la Base64 si existe
-            };
-        });
+        mostrarCarga(true);
+
+        const responsable = document.getElementById('responsable').value;
+        const fotoInput = document.getElementById('fotoEvidencia');
         
-        // 2. Generar el Objeto de Datos Final (JSON)
-        const registroFinal = {
-            metadata: {
-                fechaHora: new Date().toISOString(),
-                responsable: responsable,
-                horaCierreRegistrada: horaCierre,
-            },
-            firmaBase64: canvas.toDataURL('image/png'),
-            tareas: registroTareas
+        let datos = {
+            responsable: responsable,
+            pitbull: getCheck('pitbull'),
+            unidades: getCheck('unidades'),
+            bodegas: getCheck('bodegas'),
+            combustible: getCheck('combustible'),
+            basura: getCheck('basura'),
+            patio: getCheck('patio'),
+            imagen: null
         };
 
-        // 3. Simulación de Envío a la Nube (Servicio Serverless)
-        console.log('--- DATOS LISTOS PARA ENVIAR A SERVIDOR ---');
-        console.log(registroFinal);
-        
-        // --- COMENTAR ESTO PARA EL USO EN PRODUCCIÓN ---
-        alert('✅ Datos Recopilados con éxito.\nAhora, estos datos serían enviados a su Netlify/Vercel Function para ser guardados de forma segura en GitHub.');
-        
-        // Aquí iría el código real de la función fetch:
-        /*
-        fetch('URL_DE_SU_FUNCION_SERVERLESS', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(registroFinal)
-        })
-        .then(response => {
-            // Manejo de éxito/fallo del servidor
-        })
-        */
+        // Procesar imagen si existe
+        if (fotoInput.files.length > 0) {
+            try {
+                const archivo = fotoInput.files[0];
+                const base64 = await leerArchivo(archivo);
+                datos.imagen = {
+                    data: base64,
+                    mimeType: archivo.type,
+                    nombre: archivo.name
+                };
+            } catch (error) {
+                console.error("Error leyendo imagen", error);
+                alert("Error al procesar la imagen");
+                mostrarCarga(false);
+                return;
+            }
+        }
 
-        // Resetear el formulario después de la simulación
-        document.getElementById('checklistForm').reset();
-        limpiarFirma();
-        document.getElementById('fechaCierre').value = new Date().toLocaleDateString('es-ES', { 
-            year: 'numeric', month: 'long', day: 'numeric' 
+        // Enviar a Google Sheets
+        try {
+            await fetch(URL_SCRIPT, {
+                method: 'POST',
+                mode: 'no-cors', // Importante para Apps Script
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+            
+            alert("✅ ¡Cierre registrado exitosamente!");
+            document.getElementById('formularioCierre').reset();
+            mostrarCarga(false);
+            
+        } catch (error) {
+            alert("❌ Hubo un error al conectar con el servidor.");
+            console.error(error);
+            mostrarCarga(false);
+        }
+    });
+
+    // Utilidades
+    function getCheck(id) {
+        return document.getElementById(id).checked ? "SI" : "NO";
+    }
+
+    function mostrarCarga(estado) {
+        document.getElementById('loadingOverlay').style.display = estado ? 'flex' : 'none';
+    }
+
+    // Convertir imagen a Base64
+    function leerArchivo(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
         });
-        document.querySelectorAll('.adjunto-label').forEach(label => {
-            label.textContent = 'Adjuntar Foto';
-            label.classList.remove('file-attached');
+    }
+
+    // Cargar Estadísticas
+    async function cargarEstadisticas() {
+        if(URL_SCRIPT.includes("AQUÍ_TU_URL")) return;
+        
+        try {
+            const response = await fetch(URL_SCRIPT);
+            const data = await response.json();
+            
+            actualizarTabla(data);
+            actualizarGrafico(data);
+        } catch (error) {
+            console.error("Error cargando estadísticas", error);
+        }
+    }
+
+    function actualizarTabla(data) {
+        const tbody = document.querySelector("#tablaLogs tbody");
+        tbody.innerHTML = "";
+        
+        // Mostrar solo los últimos 10
+        const ultimos = data.reverse().slice(0, 10);
+
+        ultimos.forEach(d => {
+            const fecha = new Date(d.fecha).toLocaleDateString();
+            const linkFoto = d.foto && d.foto.includes("http") 
+                ? `<a href="${d.foto}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-eye"></i> Ver</a>` 
+                : '<span class="text-muted">-</span>';
+
+            const fila = `
+                <tr>
+                    <td>${fecha}</td>
+                    <td><strong>${d.responsable}</strong></td>
+                    <td>${linkFoto}</td>
+                    <td><span class="badge bg-success">Completado</span></td>
+                </tr>
+            `;
+            tbody.innerHTML += fila;
+        });
+    }
+
+    let miGrafico;
+    function actualizarGrafico(data) {
+        const diasSemana = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+        const conteo = [0,0,0,0,0,0,0];
+
+        data.forEach(d => {
+            const f = new Date(d.fecha);
+            conteo[f.getDay()]++;
+        });
+
+        const ctx = document.getElementById('graficoCierres');
+        
+        if (miGrafico) miGrafico.destroy();
+
+        miGrafico = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: diasSemana.slice(1, 6), // Lunes a Viernes
+                datasets: [{
+                    label: 'Cierres Realizados',
+                    data: conteo.slice(1, 6),
+                    backgroundColor: '#3b82f6',
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                }
+            }
         });
     }
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
