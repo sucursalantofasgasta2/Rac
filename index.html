@@ -3,82 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Cierre - Rent a Car</title>
+    <title>Sistema de Cierre | Rent a Car</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
-        body { background-color: #f8f9fa; }
-        .card { border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .btn-submit { width: 100%; padding: 12px; font-weight: bold; }
+        :root {
+            --primary-color: #2563eb;
+            --bg-color: #f3f4f6;
+        }
+        body { background-color: var(--bg-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        .header-bar {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .custom-card {
+            background: white;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+        
+        .nav-pills .nav-link.active {
+            background-color: var(--primary-color);
+            border-radius: 50px;
+        }
+        
+        .nav-pills .nav-link {
+            color: #4b5563;
+            font-weight: 600;
+            margin: 0 5px;
+            border-radius: 50px;
+        }
+
+        .check-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .check-item:last-child { border-bottom: none; }
+        
+        .status-badge {
+            font-size: 0.8em;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+
+        /* Loading Overlay */
+        #loadingOverlay {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.9);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-dark bg-primary mb-4">
-    <div class="container">
-        <span class="navbar-brand">🚗 Rent a Car - Cierre Diario</span>
-    </div>
-</nav>
+<div id="loadingOverlay">
+    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
+    <h5 class="mt-3 text-secondary">Procesando y subiendo foto...</h5>
+</div>
 
-<div class="container">
-    <ul class="nav nav-pills nav-fill mb-4" id="pills-tab" role="tablist">
-        <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-registro">Registrar Cierre</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-stats" onclick="cargarEstadisticas()">Estadísticas</button></li>
+<div class="header-bar text-center">
+    <div class="container">
+        <h2 class="m-0"><i class="fa-solid fa-car-side me-2"></i>Control de Cierre</h2>
+        <small>Gestión de Seguridad y Patio</small>
+    </div>
+</div>
+
+<div class="container pb-5">
+    
+    <ul class="nav nav-pills nav-fill mb-4 justify-content-center" id="pills-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#tab-registro" type="button"><i class="fa-solid fa-list-check me-2"></i>Nuevo Registro</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#tab-stats" type="button" onclick="cargarEstadisticas()"><i class="fa-solid fa-chart-pie me-2"></i>Estadísticas</button>
+        </li>
     </ul>
 
-    <div class="tab-content">
-        <div class="tab-pane fade show active" id="tab-registro">
-            <div class="card p-4">
-                <form id="formularioCierre">
-                    <div class="mb-3">
-                        <label class="form-label">Nombre del Responsable</label>
-                        <input type="text" id="responsable" class="form-control" placeholder="Ej: Juan Pérez" required>
-                    </div>
+    <div class="tab-content" id="pills-tabContent">
+        
+        <div class="tab-pane fade show active" id="tab-registro" role="tabpanel">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <form id="formularioCierre">
+                        <div class="custom-card p-4">
+                            <h5 class="mb-4 text-secondary">📝 Datos Generales</h5>
+                            
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="responsable" placeholder="Nombre" required>
+                                <label for="responsable">Nombre del Responsable</label>
+                            </div>
 
-                    <h5 class="mt-4 mb-3">Checklist de Seguridad</h5>
-                    <div class="form-check form-switch mb-2">
-                        <input class="form-check-input" type="checkbox" id="pitbull">
-                        <label class="form-check-label">Pitbull colocado en unidades</label>
-                    </div>
-                    <div class="form-check form-switch mb-2">
-                        <input class="form-check-input" type="checkbox" id="unidades">
-                        <label class="form-check-label">Unidades cerradas</label>
-                    </div>
-                    <div class="form-check form-switch mb-2">
-                        <input class="form-check-input" type="checkbox" id="bodegas">
-                        <label class="form-check-label">Candados de bodegas</label>
-                    </div>
-                    <div class="form-check form-switch mb-2">
-                        <input class="form-check-input" type="checkbox" id="combustible">
-                        <label class="form-check-label">Candado estación combustible</label>
-                    </div>
-                    <div class="form-check form-switch mb-2">
-                        <input class="form-check-input" type="checkbox" id="basura">
-                        <label class="form-check-label">Basura del lavado despejada</label>
-                    </div>
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" id="patio">
-                        <label class="form-check-label">Patio despejado (Herramientas/Neumáticos)</label>
-                    </div>
+                            <h5 class="mt-4 mb-3 text-secondary">🛡️ Seguridad y Patio</h5>
+                            
+                            <div class="check-item">
+                                <label class="form-check-label" for="pitbull"><i class="fa-solid fa-lock me-2 text-warning"></i> Pitbull en unidades</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="pitbull">
+                                </div>
+                            </div>
+                            
+                            <div class="check-item">
+                                <label class="form-check-label" for="unidades"><i class="fa-solid fa-car me-2 text-primary"></i> Unidades cerradas</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="unidades">
+                                </div>
+                            </div>
 
-                    <button type="submit" id="btnGuardar" class="btn btn-primary btn-submit">GUARDAR CIERRE</button>
-                </form>
+                            <div class="check-item">
+                                <label class="form-check-label" for="bodegas"><i class="fa-solid fa-warehouse me-2 text-secondary"></i> Candados Bodega</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="bodegas">
+                                </div>
+                            </div>
+
+                            <div class="check-item">
+                                <label class="form-check-label" for="combustible"><i class="fa-solid fa-gas-pump me-2 text-danger"></i> Estación Combustible</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="combustible">
+                                </div>
+                            </div>
+
+                            <div class="check-item">
+                                <label class="form-check-label" for="basura"><i class="fa-solid fa-trash me-2 text-dark"></i> Basura Lavado</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="basura">
+                                </div>
+                            </div>
+
+                             <div class="check-item">
+                                <label class="form-check-label" for="patio"><i class="fa-solid fa-broom me-2 text-success"></i> Patio Ordenado</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="patio">
+                                </div>
+                            </div>
+
+                            <h5 class="mt-4 mb-3 text-secondary">📷 Evidencia Fotográfica</h5>
+                            <div class="mb-3">
+                                <input class="form-control" type="file" id="fotoEvidencia" accept="image/*">
+                                <div class="form-text">Sube una foto general del patio (Opcional)</div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 py-3 mt-3 fw-bold shadow">
+                                <i class="fa-solid fa-paper-plane me-2"></i> ENVIAR INFORME
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
 
-        <div class="tab-pane fade" id="tab-stats">
-            <div class="card p-4">
-                <h5 class="text-center">Cierres Realizados (Lunes a Viernes)</h5>
-                <canvas id="graficoCierres" height="150"></canvas>
-                <hr>
-                <h6>Últimos Registros</h6>
-                <div class="table-responsive">
-                    <table class="table table-sm" id="tablaLogs">
-                        <thead>
-                            <tr><th>Fecha</th><th>Responsable</th><th>Estado</th></tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+        <div class="tab-pane fade" id="tab-stats" role="tabpanel">
+            <div class="row">
+                <div class="col-md-12 mb-4">
+                    <div class="custom-card p-4">
+                        <h5 class="text-center text-secondary mb-3">Cumplimiento Semanal</h5>
+                        <div style="height: 250px;">
+                            <canvas id="graficoCierres"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="custom-card p-4">
+                        <h5 class="mb-3 text-secondary">Historial Reciente</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle" id="tablaLogs">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Responsable</th>
+                                        <th>Evidencia</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="4" class="text-center">Cargando datos...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -86,75 +207,165 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz_IouJxqx_Z5Oi21J3BYhoTZrZ5DwcTeSisqWvgqSHfAwpARWAVdficoG6Yw5q-k5ebg/exec";
+    // ==========================================
+    // ⚠️ PEGA AQUÍ TU URL DE GOOGLE APPS SCRIPT
+    // ==========================================
+    const URL_SCRIPT = "AQUÍ_TU_URL_DE_GOOGLE_APPS_SCRIPT"; 
 
-    // ENVIAR DATOS
+    // Función principal de envío
     document.getElementById('formularioCierre').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const btn = document.getElementById('btnGuardar');
-        btn.disabled = true;
-        btn.innerText = "Enviando...";
+        
+        // Validar URL
+        if(URL_SCRIPT.includes("AQUÍ_TU_URL")) {
+            alert("⚠️ Error: No has configurado la URL del script en el código HTML.");
+            return;
+        }
 
-        const datos = {
-            responsable: document.getElementById('responsable').value,
-            pitbull: document.getElementById('pitbull').checked ? "SI" : "NO",
-            unidades: document.getElementById('unidades').checked ? "SI" : "NO",
-            bodegas: document.getElementById('bodegas').checked ? "SI" : "NO",
-            combustible: document.getElementById('combustible').checked ? "SI" : "NO",
-            basura: document.getElementById('basura').checked ? "SI" : "NO",
-            patio: document.getElementById('patio').checked ? "SI" : "NO"
+        mostrarCarga(true);
+
+        const responsable = document.getElementById('responsable').value;
+        const fotoInput = document.getElementById('fotoEvidencia');
+        
+        let datos = {
+            responsable: responsable,
+            pitbull: getCheck('pitbull'),
+            unidades: getCheck('unidades'),
+            bodegas: getCheck('bodegas'),
+            combustible: getCheck('combustible'),
+            basura: getCheck('basura'),
+            patio: getCheck('patio'),
+            imagen: null
         };
 
+        // Procesar imagen si existe
+        if (fotoInput.files.length > 0) {
+            try {
+                const archivo = fotoInput.files[0];
+                const base64 = await leerArchivo(archivo);
+                datos.imagen = {
+                    data: base64,
+                    mimeType: archivo.type,
+                    nombre: archivo.name
+                };
+            } catch (error) {
+                console.error("Error leyendo imagen", error);
+                alert("Error al procesar la imagen");
+                mostrarCarga(false);
+                return;
+            }
+        }
+
+        // Enviar a Google Sheets
         try {
-            await fetch(SCRIPT_URL, {
+            await fetch(URL_SCRIPT, {
                 method: 'POST',
-                mode: 'no-cors',
+                mode: 'no-cors', // Importante para Apps Script
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(datos)
             });
-            alert("Cierre registrado correctamente en la base de datos.");
+            
+            alert("✅ ¡Cierre registrado exitosamente!");
             document.getElementById('formularioCierre').reset();
+            mostrarCarga(false);
+            
         } catch (error) {
-            alert("Error al conectar con el servidor.");
+            alert("❌ Hubo un error al conectar con el servidor.");
+            console.error(error);
+            mostrarCarga(false);
         }
-        btn.disabled = false;
-        btn.innerText = "GUARDAR CIERRE";
     });
 
-    // CARGAR ESTADÍSTICAS
+    // Utilidades
+    function getCheck(id) {
+        return document.getElementById(id).checked ? "SI" : "NO";
+    }
+
+    function mostrarCarga(estado) {
+        document.getElementById('loadingOverlay').style.display = estado ? 'flex' : 'none';
+    }
+
+    // Convertir imagen a Base64
+    function leerArchivo(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    // Cargar Estadísticas
     async function cargarEstadisticas() {
-        const res = await fetch(SCRIPT_URL);
-        const data = await res.json();
+        if(URL_SCRIPT.includes("AQUÍ_TU_URL")) return;
         
-        // Procesar días de la semana
-        const dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-        const conteoDias = [0, 0, 0, 0, 0, 0, 0];
-        
+        try {
+            const response = await fetch(URL_SCRIPT);
+            const data = await response.json();
+            
+            actualizarTabla(data);
+            actualizarGrafico(data);
+        } catch (error) {
+            console.error("Error cargando estadísticas", error);
+        }
+    }
+
+    function actualizarTabla(data) {
         const tbody = document.querySelector("#tablaLogs tbody");
         tbody.innerHTML = "";
+        
+        // Mostrar solo los últimos 10
+        const ultimos = data.reverse().slice(0, 10);
 
-        data.forEach(item => {
-            const fechaObj = new Date(item.fecha);
-            conteoDias[fechaObj.getDay()]++;
-            
-            // Llenar tabla
-            let row = `<tr>
-                <td>${fechaObj.toLocaleDateString()}</td>
-                <td>${item.responsable}</td>
-                <td>✅</td>
-            </tr>`;
-            tbody.innerHTML += row;
+        ultimos.forEach(d => {
+            const fecha = new Date(d.fecha).toLocaleDateString();
+            const linkFoto = d.foto && d.foto.includes("http") 
+                ? `<a href="${d.foto}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-eye"></i> Ver</a>` 
+                : '<span class="text-muted">-</span>';
+
+            const fila = `
+                <tr>
+                    <td>${fecha}</td>
+                    <td><strong>${d.responsable}</strong></td>
+                    <td>${linkFoto}</td>
+                    <td><span class="badge bg-success">Completado</span></td>
+                </tr>
+            `;
+            tbody.innerHTML += fila;
+        });
+    }
+
+    let miGrafico;
+    function actualizarGrafico(data) {
+        const diasSemana = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+        const conteo = [0,0,0,0,0,0,0];
+
+        data.forEach(d => {
+            const f = new Date(d.fecha);
+            conteo[f.getDay()]++;
         });
 
-        // Dibujar Gráfico
-        new Chart(document.getElementById('graficoCierres'), {
+        const ctx = document.getElementById('graficoCierres');
+        
+        if (miGrafico) miGrafico.destroy();
+
+        miGrafico = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ["Lun", "Mar", "Mie", "Jue", "Vie"],
+                labels: diasSemana.slice(1, 6), // Lunes a Viernes
                 datasets: [{
                     label: 'Cierres Realizados',
-                    data: conteoDias.slice(1, 6),
-                    backgroundColor: '#0d6efd'
+                    data: conteo.slice(1, 6),
+                    backgroundColor: '#3b82f6',
+                    borderRadius: 5
                 }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                }
             }
         });
     }
