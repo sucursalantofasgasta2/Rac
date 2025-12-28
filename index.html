@@ -3,54 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Cierre Rent a Car</title>
+    <title>Cierre Rent a Car</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { background: #f4f7f6; padding: 20px; font-family: sans-serif; }
-        .card { border-radius: 15px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 20px; }
-        .nav-link.active { background-color: #0052cc !important; }
-        .check-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
-        #loading { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:999; align-items:center; justify-content:center; flex-direction:column; }
+        body { background: #f8f9fa; padding: 20px; }
+        .card { border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: none; padding: 20px; }
+        .btn-primary { background: #0052cc; border: none; padding: 12px; font-weight: bold; }
+        .check-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        #loader { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:1000; align-items:center; justify-content:center; flex-direction:column; }
     </style>
 </head>
 <body>
 
-<div id="loading"><div class="spinner-border text-primary"></div><h5 class="mt-3">Enviando Datos y Fotos...</h5></div>
+<div id="loader">
+    <div class="spinner-border text-primary"></div>
+    <h5 class="mt-3">Conectando con Google Sheets...</h5>
+</div>
 
-<div class="container">
-    <ul class="nav nav-pills nav-fill mb-4 bg-white p-2 rounded-pill shadow-sm">
-        <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#reg">REGISTRO</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#sts" onclick="cargarStats()">ESTADÍSTICAS</button></li>
+<div class="container mt-3">
+    <ul class="nav nav-pills nav-fill mb-4 shadow-sm bg-white p-2 rounded-pill">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#form-tab">REGISTRO</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#stats-tab" onclick="cargarDatos()">ESTADÍSTICAS</button></li>
     </ul>
 
     <div class="tab-content">
-        <div class="tab-pane fade show active" id="reg">
+        <div class="tab-pane fade show active" id="form-tab">
             <div class="card">
-                <h4 class="text-center mb-4">Reporte de Operaciones</h4>
-                <input type="text" id="resp" class="form-control mb-4" placeholder="Nombre del Responsable">
+                <h4 class="text-center mb-4">Cierre Diario</h4>
+                <input type="text" id="nombre" class="form-control mb-3" placeholder="Tu nombre">
                 
-                <div class="check-row"><span>Pitbull en unidades</span><input type="checkbox" id="p1" class="form-check-input"></div>
-                <div class="check-row"><span>Unidades Cerradas</span><input type="checkbox" id="p2" class="form-check-input"></div>
-                <div class="check-row"><span>Candados Bodega</span><input type="checkbox" id="p3" class="form-check-input"></div>
-                <div class="check-row"><span>Estación Combustible</span><input type="checkbox" id="p4" class="form-check-input"></div>
-                <div class="check-row"><span>Basura Lavado</span><input type="checkbox" id="p5" class="form-check-input"></div>
-                <div class="check-row"><span>Patio Ordenado</span><input type="checkbox" id="p6" class="form-check-input"></div>
+                <div class="check-item"><span>Pitbull</span><input type="checkbox" id="c1" class="form-check-input"></div>
+                <div class="check-item"><span>Unidades</span><input type="checkbox" id="c2" class="form-check-input"></div>
+                <div class="check-item"><span>Bodegas</span><input type="checkbox" id="c3" class="form-check-input"></div>
+                <div class="check-item"><span>Combustible</span><input type="checkbox" id="c4" class="form-check-input"></div>
+                <div class="check-item"><span>Basura</span><input type="checkbox" id="c5" class="form-check-input"></div>
+                <div class="check-item"><span>Patio</span><input type="checkbox" id="c6" class="form-check-input"></div>
 
-                <div class="mt-4">
-                    <label class="form-label fw-bold">Adjuntar Fotos:</label>
-                    <input type="file" id="fotos" multiple accept="image/*" class="form-control mb-3">
-                    <button class="btn btn-primary w-100 py-3 fw-bold" onclick="enviar()">ENVIAR TODO</button>
-                </div>
+                <input type="file" id="fotos" class="form-control mt-4" multiple accept="image/*">
+                <button class="btn btn-primary w-100 mt-4" onclick="enviarReporte()">ENVIAR AHORA</button>
             </div>
         </div>
 
-        <div class="tab-pane fade" id="sts">
-            <div class="card">
-                <h4 class="text-center">Cumplimiento Semanal</h4>
-                <canvas id="grafico" height="150"></canvas>
-                <div class="table-responsive mt-3">
-                    <table class="table table-sm"><thead><tr><th>Fecha</th><th>Responsable</th></tr></thead><tbody id="t-body"></tbody></table>
+        <div class="tab-pane fade" id="stats-tab">
+            <div class="card text-center">
+                <h5>Cumplimiento Semanal</h5>
+                <canvas id="graficoBarras" height="200"></canvas>
+                <div class="table-responsive mt-4">
+                    <table class="table table-striped">
+                        <thead><tr><th>Fecha</th><th>Responsable</th></tr></thead>
+                        <tbody id="listaRegistros"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -58,70 +61,74 @@
 </div>
 
 <script>
-    // URL DE TU IMPLEMENTACIÓN V10
-    const API = "https://script.google.com/macros/s/AKfycbz88lpjW0eNgVWEoE2Co_5MFRwdMHo5lGq8ZS4rflQoAvH858AqnKzz8Ge13GqW8EQG-A/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzZNYTLhLqD9aop70ee7-ngizjPE8h9I8dNVBS7kVoe7vplyaKVC5SJuRrIbZZ5820x/exec";
 
-    async function enviar() {
-        const r = document.getElementById('resp').value;
-        if(!r) return alert("Por favor, ingresa tu nombre");
-        document.getElementById('loading').style.display='flex';
-
+    async function enviarReporte() {
+        const n = document.getElementById('nombre').value;
+        if(!n) return alert("Escribe tu nombre");
+        
+        document.getElementById('loader').style.display = 'flex';
+        
+        // Convertir fotos
         const fotos = [];
-        const fileList = document.getElementById('fotos').files;
-        for(let f of fileList) {
-            const b64 = await new Promise(res => {
-                const fr = new FileReader();
-                fr.onload = () => res({data: fr.result, mimeType: f.type});
-                fr.readAsDataURL(f);
+        const inputFotos = document.getElementById('fotos').files;
+        for(let f of inputFotos) {
+            const b64 = await new Promise(r => {
+                const reader = new FileReader();
+                reader.onload = () => r({data: reader.result, mimeType: f.type});
+                reader.readAsDataURL(f);
             });
             fotos.push(b64);
         }
 
         const data = {
-            responsable: r,
+            responsable: n,
             checks: {
-                p1: document.getElementById('p1').checked ? "SI" : "NO",
-                p2: document.getElementById('p2').checked ? "SI" : "NO",
-                p3: document.getElementById('p3').checked ? "SI" : "NO",
-                p4: document.getElementById('p4').checked ? "SI" : "NO",
-                p5: document.getElementById('p5').checked ? "SI" : "NO",
-                p6: document.getElementById('p6').checked ? "SI" : "NO"
+                p1: document.getElementById('c1').checked ? "SI" : "NO",
+                p2: document.getElementById('c2').checked ? "SI" : "NO",
+                p3: document.getElementById('c3').checked ? "SI" : "NO",
+                p4: document.getElementById('c4').checked ? "SI" : "NO",
+                p5: document.getElementById('c5').checked ? "SI" : "NO",
+                p6: document.getElementById('c6').checked ? "SI" : "NO"
             },
             fotos: fotos
         };
 
         try {
-            await fetch(API, {method:'POST', mode:'no-cors', body: JSON.stringify(data)});
-            alert("¡Cierre enviado con éxito!");
+            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+            alert("¡Enviado con éxito!");
             location.reload();
         } catch(e) {
-            alert("Error al enviar.");
-            document.getElementById('loading').style.display='none';
+            alert("Error de conexión");
+            document.getElementById('loader').style.display = 'none';
         }
     }
 
-    async function cargarStats() {
+    let chartObj = null;
+    async function cargarDatos() {
         try {
-            const res = await fetch(API);
-            const data = await res.json();
-            const tbody = document.getElementById('t-body');
-            tbody.innerHTML = "";
-            const dias = [0,0,0,0,0,0,0]; 
+            const res = await fetch(SCRIPT_URL);
+            const registros = await res.json();
             
-            data.slice().reverse().forEach(row => {
-                const d = new Date(row.fecha);
-                dias[d.getDay()]++;
-                tbody.innerHTML += `<tr><td>${d.toLocaleDateString()}</td><td>${row.responsable}</td></tr>`;
+            const tbody = document.getElementById('listaRegistros');
+            tbody.innerHTML = "";
+            const diasConteo = [0,0,0,0,0,0,0]; // D L M M J V S
+
+            registros.slice().reverse().forEach(r => {
+                const fecha = new Date(r.fecha);
+                diasConteo[fecha.getDay()]++;
+                tbody.innerHTML += `<tr><td>${fecha.toLocaleDateString()}</td><td>${r.responsable}</td></tr>`;
             });
 
-            new Chart(document.getElementById('grafico'), {
+            if(chartObj) chartObj.destroy();
+            chartObj = new Chart(document.getElementById('graficoBarras'), {
                 type: 'bar',
                 data: {
                     labels: ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'],
-                    datasets: [{label: 'Cierres realizados', data: dias, backgroundColor: '#0052cc'}]
+                    datasets: [{ label: 'Cierres', data: diasConteo, backgroundColor: '#0052cc' }]
                 }
             });
-        } catch(e) { console.error("Error cargando stats:", e); }
+        } catch(e) { console.error("Aún no hay datos para mostrar"); }
     }
 </script>
 </body>
