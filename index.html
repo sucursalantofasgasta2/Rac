@@ -3,117 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Cierre | Rent a Car</title>
+    <title>Gestión de Cierre | Rent a Car</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { background-color: #f8f9fa; font-family: sans-serif; }
-        .header-blue { background: #0052cc; color: white; padding: 25px 0; border-radius: 0 0 20px 20px; margin-bottom: 20px; }
-        .card-custom { background: white; border-radius: 15px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 20px; }
-        .item-check { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
-        .btn-upload { border: 2px dashed #0052cc; background: #f0f7ff; padding: 20px; border-radius: 10px; cursor: pointer; text-align: center; }
-        #loading { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:9999; align-items:center; justify-content:center; flex-direction:column; }
+        :root { --primary-color: #0052cc; --bg-color: #f4f7f6; }
+        body { background-color: var(--bg-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding-bottom: 30px; }
+        .navbar { background-color: var(--primary-color); color: white; border-radius: 0 0 20px 20px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .main-card { background: white; border-radius: 20px; border: none; box-shadow: 0 8px 20px rgba(0,0,0,0.05); padding: 25px; }
+        .nav-pills .nav-link { border-radius: 50px; font-weight: 600; color: #5e6c84; }
+        .nav-pills .nav-link.active { background-color: var(--primary-color); }
+        .check-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #edf0f2; }
+        .check-item:last-child { border-bottom: none; }
+        .form-check-input { width: 2.5em; height: 1.25em; cursor: pointer; }
+        .btn-submit { background-color: var(--primary-color); border: none; padding: 15px; border-radius: 12px; font-weight: bold; transition: 0.3s; }
+        .btn-submit:hover { background-color: #0747a6; transform: translateY(-2px); }
+        .upload-area { border: 2px dashed var(--primary-color); border-radius: 15px; background: #f0f7ff; padding: 30px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .upload-area:hover { background: #e0eeff; }
+        #loadingOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:9999; align-items:center; justify-content:center; flex-direction:column; }
     </style>
 </head>
 <body>
 
-<div id="loading">
-    <div class="spinner-border text-primary" role="status"></div>
-    <h4 class="mt-3">Enviando Reporte...</h4>
-    <p>Por favor, no cierres esta ventana.</p>
+<div id="loadingOverlay">
+    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
+    <h4 class="mt-3 fw-bold">Enviando Reporte...</h4>
+    <p class="text-muted">Procesando información y fotografías</p>
 </div>
 
-<div class="header-blue text-center shadow">
-    <h2 class="fw-bold">REPORTE DE CIERRE</h2>
-    <p class="m-0">Gestión Operativa Rent a Car</p>
-</div>
+<nav class="navbar py-3">
+    <div class="container justify-content-center">
+        <span class="navbar-brand m-0 h1 text-uppercase fw-bold"><i class="fas fa-clipboard-check me-2"></i> Gestión Rent a Car</span>
+    </div>
+</nav>
 
-<div class="container mb-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card-custom">
-                <form id="formCierre">
+<div class="container">
+    <ul class="nav nav-pills nav-fill mb-4 bg-white p-2 rounded-pill shadow-sm" id="pills-tab">
+        <li class="nav-item">
+            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-registro"><i class="fas fa-edit me-2"></i>REGISTRO</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-stats" onclick="cargarEstadisticas()"><i class="fas fa-chart-bar me-2"></i>ESTADÍSTICAS</button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="tab-registro">
+            <div class="main-card">
+                <form id="cierreForm">
                     <div class="mb-4">
                         <label class="form-label fw-bold text-secondary">NOMBRE DEL RESPONSABLE</label>
-                        <input type="text" id="responsable" class="form-control form-control-lg" placeholder="Escribe tu nombre" required>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-0"><i class="fas fa-user text-primary"></i></span>
+                            <input type="text" id="responsable" class="form-control bg-light border-0" placeholder="Ej: Mohammed" required>
+                        </div>
                     </div>
 
-                    <h6 class="fw-bold text-primary mb-3">LISTA DE VERIFICACIÓN</h6>
-                    <div class="mb-4">
-                        <div class="item-check"><span><i class="fas fa-lock me-2"></i> Pitbull en unidades</span><input class="form-check-input fs-4" type="checkbox" id="c1"></div>
-                        <div class="item-check"><span><i class="fas fa-car me-2"></i> Unidades cerradas</span><input class="form-check-input fs-4" type="checkbox" id="c2"></div>
-                        <div class="item-check"><span><i class="fas fa-warehouse me-2"></i> Candados Bodegas</span><input class="form-check-input fs-4" type="checkbox" id="c3"></div>
-                        <div class="item-check"><span><i class="fas fa-gas-pump me-2"></i> Candado Combustible</span><input class="form-check-input fs-4" type="checkbox" id="c4"></div>
-                        <div class="item-check"><span><i class="fas fa-trash me-2"></i> Basura Lavado</span><input class="form-check-input fs-4" type="checkbox" id="c5"></div>
-                        <div class="item-check"><span><i class="fas fa-broom me-2"></i> Patio Ordenado</span><input class="form-check-input fs-4" type="checkbox" id="c6"></div>
+                    <h6 class="fw-bold text-secondary mb-3 mt-4">CHECKLIST DE CIERRE</h6>
+                    <div class="card bg-light border-0 p-2 mb-4">
+                        <div class="check-item"><span>Pitbull en unidades</span><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="p1"></div></div>
+                        <div class="check-item"><span>Unidades cerradas</span><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="p2"></div></div>
+                        <div class="check-item"><span>Candados Bodegas</span><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="p3"></div></div>
+                        <div class="check-item"><span>Estación Combustible</span><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="p4"></div></div>
+                        <div class="check-item"><span>Basura Lavado</span><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="p5"></div></div>
+                        <div class="check-item"><span>Patio Ordenado</span><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="p6"></div></div>
                     </div>
 
-                    <div class="btn-upload mb-4" onclick="document.getElementById('fotos').click()">
-                        <i class="fas fa-camera fa-2x text-primary mb-2"></i>
-                        <p class="m-0 fw-bold">Subir Fotos de Evidencia</p>
-                        <small id="statusFotos" class="text-muted text-uppercase">0 fotos seleccionadas</small>
-                        <input type="file" id="fotos" class="d-none" multiple accept="image/*" onchange="actualizarContador()">
+                    <h6 class="fw-bold text-secondary mb-3">EVIDENCIAS (FOTOS MÚLTIPLES)</h6>
+                    <div class="upload-area mb-4" onclick="document.getElementById('inputFotos').click()">
+                        <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-2"></i>
+                        <p class="mb-0 fw-bold">Click aquí para tomar fotos</p>
+                        <small id="textFotos" class="text-muted">Se recomienda subir al menos 2 fotos del patio</small>
+                        <input type="file" id="inputFotos" class="d-none" multiple accept="image/*" onchange="actualizarContador()">
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold shadow">ENVIAR INFORME FINAL</button>
+                    <button type="submit" class="btn btn-primary btn-submit w-100 shadow-lg text-white">SUBIR REPORTE AL EXCEL</button>
                 </form>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-stats">
+            <div class="main-card">
+                <h5 class="text-center fw-bold mb-4">Actividad de la Semana</h5>
+                <div style="height: 300px;"><canvas id="chartWeekly"></canvas></div>
+                <hr class="my-5">
+                <h6 class="fw-bold mb-3"><i class="fas fa-history me-2"></i>Últimos registros</h6>
+                <div class="table-responsive">
+                    <table class="table table-hover" id="tablaLogs">
+                        <thead class="table-light"><tr><th>Fecha</th><th>Responsable</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // URL DE TU IMPLEMENTACIÓN VERSIÓN 9
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzLfDO7nJMEXagqIOhqHdUmRzC4roaVxusrRj_55VmEt2z7qvldfgi_SlgpgI5SyvLJQw/exec";
+    const URL_APP = "https://script.google.com/macros/s/AKfycbz88lpjW0eNgVWEoE2Co_5MFRwdMHo5lGq8ZS4rflQoAvH858AqnKzz8Ge13GqW8EQG-A/exec";
 
     function actualizarContador() {
-        const cant = document.getElementById('fotos').files.length;
-        document.getElementById('statusFotos').innerText = cant + " fotos listas para enviar";
+        const cant = document.getElementById('inputFotos').files.length;
+        document.getElementById('textFotos').innerText = cant + " fotos seleccionadas";
+        document.getElementById('textFotos').className = "text-success fw-bold";
     }
 
-    // Convertir imagen para que Google la entienda
-    const reader = file => new Promise((res, rej) => {
-        const fr = new FileReader();
-        fr.onload = () => res({ data: fr.result, mimeType: file.type });
-        fr.readAsDataURL(file);
+    const fileToB64 = file => new Promise((res, rej) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => res({ data: reader.result, mimeType: file.type });
+        reader.onerror = e => rej(e);
     });
 
-    document.getElementById('formCierre').addEventListener('submit', async (e) => {
+    document.getElementById('cierreForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        document.getElementById('loading').style.display = 'flex';
+        document.getElementById('loadingOverlay').style.display = 'flex';
 
-        // Procesar fotos
-        const fileInput = document.getElementById('fotos');
-        const fotosBase64 = await Promise.all(Array.from(fileInput.files).map(f => reader(f)));
+        const fileInput = document.getElementById('inputFotos');
+        const fotosB64 = await Promise.all(Array.from(fileInput.files).map(f => fileToB64(f)));
 
-        const datos = {
+        const payload = {
             responsable: document.getElementById('responsable').value,
             checks: {
-                pitbull: document.getElementById('c1').checked ? "SI" : "NO",
-                unidades: document.getElementById('c2').checked ? "SI" : "NO",
-                bodegas: document.getElementById('c3').checked ? "SI" : "NO",
-                combustible: document.getElementById('c4').checked ? "SI" : "NO",
-                basura: document.getElementById('c5').checked ? "SI" : "NO",
-                patio: document.getElementById('c6').checked ? "SI" : "NO"
+                p1: document.getElementById('p1').checked ? "SI" : "NO",
+                p2: document.getElementById('p2').checked ? "SI" : "NO",
+                p3: document.getElementById('p3').checked ? "SI" : "NO",
+                p4: document.getElementById('p4').checked ? "SI" : "NO",
+                p5: document.getElementById('p5').checked ? "SI" : "NO",
+                p6: document.getElementById('p6').checked ? "SI" : "NO"
             },
-            fotos: fotosBase64
+            fotos: fotosB64
         };
 
         try {
-            // Envío a Google Sheets
-            await fetch(WEB_APP_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify(datos)
-            });
-
-            alert("✅ ¡Cierre enviado con éxito al Excel!");
-            location.reload(); // Limpiar formulario
+            await fetch(URL_APP, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+            alert("✅ ¡Cierre enviado correctamente!");
+            location.reload();
         } catch (err) {
-            alert("Error: " + err);
-            document.getElementById('loading').style.display = 'none';
+            alert("Error al enviar: " + err);
+            document.getElementById('loadingOverlay').style.display = 'none';
         }
     });
+
+    let miGrafico = null;
+    async function cargarEstadisticas() {
+        try {
+            const res = await fetch(URL_APP);
+            const data = await res.json();
+            
+            const tbody = document.querySelector("#tablaLogs tbody");
+            tbody.innerHTML = "";
+            const conteo = [0, 0, 0, 0, 0, 0, 0]; // D L M M J V S
+
+            data.slice().reverse().forEach(row => {
+                const fechaObj = new Date(row.fecha);
+                conteo[fechaObj.getDay()]++;
+                tbody.innerHTML += `<tr><td>${fechaObj.toLocaleDateString()}</td><td>${row.responsable}</td></tr>`;
+            });
+
+            if (miGrafico) miGrafico.destroy();
+            miGrafico = new Chart(document.getElementById('chartWeekly'), {
+                type: 'bar',
+                data: {
+                    labels: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+                    datasets: [{ label: 'Cierres', data: conteo, backgroundColor: '#0052cc', borderRadius: 5 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        } catch (e) { console.error(e); }
+    }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
