@@ -3,97 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Cierre | Rent a Car</title>
+    <title>Sistema Cierre Rent a Car</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --primary-color: #0052cc; --bg-color: #f4f7f6; }
-        body { background-color: var(--bg-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding-bottom: 30px; }
-        .navbar { background-color: var(--primary-color); color: white; border-radius: 0 0 20px 20px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .main-card { background: white; border-radius: 20px; border: none; box-shadow: 0 8px 20px rgba(0,0,0,0.05); padding: 25px; }
-        .nav-pills .nav-link { border-radius: 50px; font-weight: 600; color: #5e6c84; }
-        .nav-pills .nav-link.active { background-color: var(--primary-color); }
-        .check-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #edf0f2; }
-        .check-item:last-child { border-bottom: none; }
-        .form-check-input { width: 2.5em; height: 1.25em; cursor: pointer; }
-        .btn-submit { background-color: var(--primary-color); border: none; padding: 15px; border-radius: 12px; font-weight: bold; transition: 0.3s; }
-        .btn-submit:hover { background-color: #0747a6; transform: translateY(-2px); }
-        .upload-area { border: 2px dashed var(--primary-color); border-radius: 15px; background: #f0f7ff; padding: 30px; text-align: center; cursor: pointer; transition: 0.3s; }
-        .upload-area:hover { background: #e0eeff; }
-        #loadingOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:9999; align-items:center; justify-content:center; flex-direction:column; }
+        body { background: #f4f7f6; padding: 20px; font-family: sans-serif; }
+        .card { border-radius: 15px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 20px; }
+        .nav-link.active { background-color: #0052cc !important; }
+        .check-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        #loading { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:999; align-items:center; justify-content:center; flex-direction:column; }
     </style>
 </head>
 <body>
 
-<div id="loadingOverlay">
-    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
-    <h4 class="mt-3 fw-bold">Enviando Reporte...</h4>
-    <p class="text-muted">Procesando información y fotografías</p>
-</div>
-
-<nav class="navbar py-3">
-    <div class="container justify-content-center">
-        <span class="navbar-brand m-0 h1 text-uppercase fw-bold"><i class="fas fa-clipboard-check me-2"></i> Gestión Rent a Car</span>
-    </div>
-</nav>
+<div id="loading"><div class="spinner-border text-primary"></div><h5 class="mt-3">Enviando Datos y Fotos...</h5></div>
 
 <div class="container">
-    <ul class="nav nav-pills nav-fill mb-4 bg-white p-2 rounded-pill shadow-sm" id="pills-tab">
-        <li class="nav-item">
-            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-registro"><i class="fas fa-edit me-2"></i>REGISTRO</button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-stats" onclick="cargarEstadisticas()"><i class="fas fa-chart-bar me-2"></i>ESTADÍSTICAS</button>
-        </li>
+    <ul class="nav nav-pills nav-fill mb-4 bg-white p-2 rounded-pill shadow-sm">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#reg">REGISTRO</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#sts" onclick="cargarStats()">ESTADÍSTICAS</button></li>
     </ul>
 
     <div class="tab-content">
-        <div class="tab-pane fade show active" id="tab-registro">
-            <div class="main-card">
-                <form id="cierreForm">
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-secondary">NOMBRE DEL RESPONSABLE</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-0"><i class="fas fa-user text-primary"></i></span>
-                            <input type="text" id="responsable" class="form-control bg-light border-0" placeholder="Ej: Mohammed" required>
-                        </div>
-                    </div>
+        <div class="tab-pane fade show active" id="reg">
+            <div class="card">
+                <h4 class="text-center mb-4">Reporte de Operaciones</h4>
+                <input type="text" id="resp" class="form-control mb-4" placeholder="Nombre del Responsable">
+                
+                <div class="check-row"><span>Pitbull en unidades</span><input type="checkbox" id="p1" class="form-check-input"></div>
+                <div class="check-row"><span>Unidades Cerradas</span><input type="checkbox" id="p2" class="form-check-input"></div>
+                <div class="check-row"><span>Candados Bodega</span><input type="checkbox" id="p3" class="form-check-input"></div>
+                <div class="check-row"><span>Estación Combustible</span><input type="checkbox" id="p4" class="form-check-input"></div>
+                <div class="check-row"><span>Basura Lavado</span><input type="checkbox" id="p5" class="form-check-input"></div>
+                <div class="check-row"><span>Patio Ordenado</span><input type="checkbox" id="p6" class="form-check-input"></div>
 
-                    <h6 class="fw-bold text-secondary mb-3 mt-4">CHECKLIST DE CIERRE</h6>
-                    <div class="card bg-light border-0 p-2 mb-4">
-                        <div class="check-item"><span>Pitbull en unidades</span><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="p1"></div></div>
-                        <div class="check-item"><span>Unidades cerradas</span><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="p2"></div></div>
-                        <div class="check-item"><span>Candados Bodegas</span><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="p3"></div></div>
-                        <div class="check-item"><span>Estación Combustible</span><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="p4"></div></div>
-                        <div class="check-item"><span>Basura Lavado</span><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="p5"></div></div>
-                        <div class="check-item"><span>Patio Ordenado</span><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="p6"></div></div>
-                    </div>
-
-                    <h6 class="fw-bold text-secondary mb-3">EVIDENCIAS (FOTOS MÚLTIPLES)</h6>
-                    <div class="upload-area mb-4" onclick="document.getElementById('inputFotos').click()">
-                        <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-2"></i>
-                        <p class="mb-0 fw-bold">Click aquí para tomar fotos</p>
-                        <small id="textFotos" class="text-muted">Se recomienda subir al menos 2 fotos del patio</small>
-                        <input type="file" id="inputFotos" class="d-none" multiple accept="image/*" onchange="actualizarContador()">
-                    </div>
-
-                    <button type="submit" class="btn btn-primary btn-submit w-100 shadow-lg text-white">SUBIR REPORTE AL EXCEL</button>
-                </form>
+                <div class="mt-4">
+                    <label class="form-label fw-bold">Adjuntar Fotos:</label>
+                    <input type="file" id="fotos" multiple accept="image/*" class="form-control mb-3">
+                    <button class="btn btn-primary w-100 py-3 fw-bold" onclick="enviar()">ENVIAR TODO</button>
+                </div>
             </div>
         </div>
 
-        <div class="tab-pane fade" id="tab-stats">
-            <div class="main-card">
-                <h5 class="text-center fw-bold mb-4">Actividad de la Semana</h5>
-                <div style="height: 300px;"><canvas id="chartWeekly"></canvas></div>
-                <hr class="my-5">
-                <h6 class="fw-bold mb-3"><i class="fas fa-history me-2"></i>Últimos registros</h6>
-                <div class="table-responsive">
-                    <table class="table table-hover" id="tablaLogs">
-                        <thead class="table-light"><tr><th>Fecha</th><th>Responsable</th></tr></thead>
-                        <tbody></tbody>
-                    </table>
+        <div class="tab-pane fade" id="sts">
+            <div class="card">
+                <h4 class="text-center">Cumplimiento Semanal</h4>
+                <canvas id="grafico" height="150"></canvas>
+                <div class="table-responsive mt-3">
+                    <table class="table table-sm"><thead><tr><th>Fecha</th><th>Responsable</th></tr></thead><tbody id="t-body"></tbody></table>
                 </div>
             </div>
         </div>
@@ -101,30 +58,27 @@
 </div>
 
 <script>
-    const URL_APP = "https://script.google.com/macros/s/AKfycbz88lpjW0eNgVWEoE2Co_5MFRwdMHo5lGq8ZS4rflQoAvH858AqnKzz8Ge13GqW8EQG-A/exec";
+    // URL DE TU IMPLEMENTACIÓN V10
+    const API = "https://script.google.com/macros/s/AKfycbz88lpjW0eNgVWEoE2Co_5MFRwdMHo5lGq8ZS4rflQoAvH858AqnKzz8Ge13GqW8EQG-A/exec";
 
-    function actualizarContador() {
-        const cant = document.getElementById('inputFotos').files.length;
-        document.getElementById('textFotos').innerText = cant + " fotos seleccionadas";
-        document.getElementById('textFotos').className = "text-success fw-bold";
-    }
+    async function enviar() {
+        const r = document.getElementById('resp').value;
+        if(!r) return alert("Por favor, ingresa tu nombre");
+        document.getElementById('loading').style.display='flex';
 
-    const fileToB64 = file => new Promise((res, rej) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => res({ data: reader.result, mimeType: file.type });
-        reader.onerror = e => rej(e);
-    });
+        const fotos = [];
+        const fileList = document.getElementById('fotos').files;
+        for(let f of fileList) {
+            const b64 = await new Promise(res => {
+                const fr = new FileReader();
+                fr.onload = () => res({data: fr.result, mimeType: f.type});
+                fr.readAsDataURL(f);
+            });
+            fotos.push(b64);
+        }
 
-    document.getElementById('cierreForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        document.getElementById('loadingOverlay').style.display = 'flex';
-
-        const fileInput = document.getElementById('inputFotos');
-        const fotosB64 = await Promise.all(Array.from(fileInput.files).map(f => fileToB64(f)));
-
-        const payload = {
-            responsable: document.getElementById('responsable').value,
+        const data = {
+            responsable: r,
             checks: {
                 p1: document.getElementById('p1').checked ? "SI" : "NO",
                 p2: document.getElementById('p2').checked ? "SI" : "NO",
@@ -133,47 +87,42 @@
                 p5: document.getElementById('p5').checked ? "SI" : "NO",
                 p6: document.getElementById('p6').checked ? "SI" : "NO"
             },
-            fotos: fotosB64
+            fotos: fotos
         };
 
         try {
-            await fetch(URL_APP, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-            alert("✅ ¡Cierre enviado correctamente!");
+            await fetch(API, {method:'POST', mode:'no-cors', body: JSON.stringify(data)});
+            alert("¡Cierre enviado con éxito!");
             location.reload();
-        } catch (err) {
-            alert("Error al enviar: " + err);
-            document.getElementById('loadingOverlay').style.display = 'none';
+        } catch(e) {
+            alert("Error al enviar.");
+            document.getElementById('loading').style.display='none';
         }
-    });
+    }
 
-    let miGrafico = null;
-    async function cargarEstadisticas() {
+    async function cargarStats() {
         try {
-            const res = await fetch(URL_APP);
+            const res = await fetch(API);
             const data = await res.json();
-            
-            const tbody = document.querySelector("#tablaLogs tbody");
+            const tbody = document.getElementById('t-body');
             tbody.innerHTML = "";
-            const conteo = [0, 0, 0, 0, 0, 0, 0]; // D L M M J V S
-
+            const dias = [0,0,0,0,0,0,0]; 
+            
             data.slice().reverse().forEach(row => {
-                const fechaObj = new Date(row.fecha);
-                conteo[fechaObj.getDay()]++;
-                tbody.innerHTML += `<tr><td>${fechaObj.toLocaleDateString()}</td><td>${row.responsable}</td></tr>`;
+                const d = new Date(row.fecha);
+                dias[d.getDay()]++;
+                tbody.innerHTML += `<tr><td>${d.toLocaleDateString()}</td><td>${row.responsable}</td></tr>`;
             });
 
-            if (miGrafico) miGrafico.destroy();
-            miGrafico = new Chart(document.getElementById('chartWeekly'), {
+            new Chart(document.getElementById('grafico'), {
                 type: 'bar',
                 data: {
-                    labels: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
-                    datasets: [{ label: 'Cierres', data: conteo, backgroundColor: '#0052cc', borderRadius: 5 }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
+                    labels: ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'],
+                    datasets: [{label: 'Cierres realizados', data: dias, backgroundColor: '#0052cc'}]
+                }
             });
-        } catch (e) { console.error(e); }
+        } catch(e) { console.error("Error cargando stats:", e); }
     }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
