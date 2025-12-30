@@ -3,167 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cierre de Operaciones | Rent a Car</title>
+    <title>Rent a Car - Sistema de Cierre</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --primary: #0052cc; --bg: #f4f7f6; }
-        body { background-color: var(--bg); font-family: 'Segoe UI', sans-serif; padding: 20px; }
-        .card-custom { background: white; border-radius: 15px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 25px; }
-        .nav-pills .nav-link.active { background-color: var(--primary); }
-        .check-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
-        .btn-send { background-color: var(--primary); color: white; font-weight: bold; padding: 15px; border-radius: 10px; border: none; width: 100%; transition: 0.3s; }
-        .btn-send:hover { background-color: #0747a6; transform: translateY(-2px); }
-        #overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:999; align-items:center; justify-content:center; flex-direction:column; }
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; padding: 20px; }
+        .contenedor-principal { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 600px; margin: auto; }
+        .titulo-app { color: #0d6efd; font-weight: bold; text-align: center; margin-bottom: 20px; text-transform: uppercase; }
+        .item-check { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; padding: 12px 0; }
+        .btn-enviar { width: 100%; padding: 15px; font-size: 1.1rem; font-weight: bold; margin-top: 25px; border-radius: 10px; }
+        #overlay-carga { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:9999; align-items:center; justify-content:center; flex-direction:column; }
     </style>
 </head>
 <body>
 
-<div id="overlay">
+<div id="overlay-carga">
     <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div>
-    <h5 class="mt-3 fw-bold">Enviando datos al Excel...</h5>
+    <h4 class="mt-3 text-primary fw-bold">Guardando reporte...</h4>
+    <p class="text-muted">Subiendo fotos y datos al Excel</p>
 </div>
 
-<div class="container" style="max-width: 500px;">
-    <ul class="nav nav-pills nav-fill mb-4 bg-white p-2 rounded-pill shadow-sm">
+<div class="container">
+    <ul class="nav nav-pills nav-fill mb-4 contenedor-principal p-2">
         <li class="nav-item">
-            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-registro">REGISTRO</button>
+            <button class="nav-link active fw-bold" data-bs-toggle="pill" data-bs-target="#panel-registro">📝 REGISTRO</button>
         </li>
         <li class="nav-item">
-            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-stats" onclick="cargarEstadisticas()">ESTADÍSTICAS</button>
+            <button class="nav-link fw-bold" data-bs-toggle="pill" data-bs-target="#panel-stats" onclick="cargarEstadisticas()">📊 ESTADÍSTICAS</button>
         </li>
     </ul>
 
     <div class="tab-content">
-        <div class="tab-pane fade show active" id="tab-registro">
-            <div class="card-custom">
-                <h4 class="text-center mb-4 fw-bold">Cierre Diario</h4>
+        
+        <div class="tab-pane fade show active" id="panel-registro">
+            <div class="contenedor-principal">
+                <h3 class="titulo-app">Nuevo Cierre</h3>
                 
                 <div class="mb-4">
-                    <label class="form-label fw-bold text-secondary">Responsable</label>
-                    <input type="text" id="responsable" class="form-control form-control-lg" placeholder="Nombre" required>
+                    <label class="form-label fw-bold">Nombre del Responsable:</label>
+                    <input type="text" id="campoNombre" class="form-control form-control-lg" placeholder="Ej: Mohammed" required>
                 </div>
 
-                <div class="mb-4">
-                    <h6 class="fw-bold text-secondary border-bottom pb-2">Checklist</h6>
-                    <div class="check-row"><span>Pitbull en unidades</span><input type="checkbox" id="p1" class="form-check-input shadow-none"></div>
-                    <div class="check-row"><span>Unidades cerradas</span><input type="checkbox" id="p2" class="form-check-input shadow-none"></div>
-                    <div class="check-row"><span>Candados Bodegas</span><input type="checkbox" id="p3" class="form-check-input shadow-none"></div>
-                    <div class="check-row"><span>Estación Combustible</span><input type="checkbox" id="p4" class="form-check-input shadow-none"></div>
-                    <div class="check-row"><span>Basura Lavado</span><input type="checkbox" id="p5" class="form-check-input shadow-none"></div>
-                    <div class="check-row"><span>Patio Ordenado</span><input type="checkbox" id="p6" class="form-check-input shadow-none"></div>
+                <h6 class="text-muted fw-bold border-bottom pb-2">Checklist Operativo</h6>
+                <div class="item-check"><span>🐶 Pitbull en unidades</span><input type="checkbox" id="chk1" class="form-check-input" style="transform: scale(1.3);"></div>
+                <div class="item-check"><span>🚗 Unidades cerradas</span><input type="checkbox" id="chk2" class="form-check-input" style="transform: scale(1.3);"></div>
+                <div class="item-check"><span>🔒 Candados Bodegas</span><input type="checkbox" id="chk3" class="form-check-input" style="transform: scale(1.3);"></div>
+                <div class="item-check"><span>⛽ Estación Combustible</span><input type="checkbox" id="chk4" class="form-check-input" style="transform: scale(1.3);"></div>
+                <div class="item-check"><span>🗑️ Basura Lavado</span><input type="checkbox" id="chk5" class="form-check-input" style="transform: scale(1.3);"></div>
+                <div class="item-check"><span>🧹 Patio Ordenado</span><input type="checkbox" id="chk6" class="form-check-input" style="transform: scale(1.3);"></div>
+
+                <div class="mt-4">
+                    <label class="form-label fw-bold">📸 Evidencia (Fotos):</label>
+                    <input type="file" id="campoFotos" multiple accept="image/*" class="form-control">
+                    <small class="text-muted">Puedes seleccionar varias fotos a la vez.</small>
                 </div>
 
-                <div class="mb-4">
-                    <label class="form-label fw-bold text-secondary">Evidencia (Fotos)</label>
-                    <input type="file" id="fotos" class="form-control" multiple accept="image/*">
-                </div>
-
-                <button class="btn-send shadow" onclick="enviarReporte()">ENVIAR AHORA</button>
+                <button class="btn btn-primary btn-enviar shadow" onclick="procesarEnvio()">ENVIAR AHORA</button>
             </div>
         </div>
 
-        <div class="tab-pane fade" id="tab-stats">
-            <div class="card-custom">
-                <h5 class="text-center fw-bold mb-4">Actividad Semanal</h5>
-                <canvas id="graficoSemanal" height="250"></canvas>
-                <div class="table-responsive mt-4">
-                    <table class="table table-sm">
-                        <thead class="table-light"><tr><th>Fecha</th><th>Nombre</th></tr></thead>
-                        <tbody id="tablaLogs"></tbody>
+        <div class="tab-pane fade" id="panel-stats">
+            <div class="contenedor-principal text-center">
+                <h3 class="titulo-app">Reporte Semanal</h3>
+                <canvas id="graficoBarras"></canvas>
+                <hr class="my-4">
+                <h6 class="text-start fw-bold">Últimos Registros:</h6>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover text-start" id="tabla-registros">
+                        <thead class="table-light"><tr><th>Fecha</th><th>Responsable</th></tr></thead>
+                        <tbody><tr><td colspan="2">Cargando datos...</td></tr></tbody>
                     </table>
                 </div>
+                <button class="btn btn-outline-primary btn-sm mt-2" onclick="cargarEstadisticas()">🔄 Actualizar</button>
             </div>
         </div>
+
     </div>
 </div>
 
 <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby_0XLNd6ZizQFBUaStwDht2FBFEFq_26Nx2HUBFt5mgQjuqgatZx1Nvwv6H3yZsidRIw/exec";
+    // --- TU URL YA ESTÁ PEGADA AQUÍ ---
+    const API_URL = "https://script.google.com/macros/s/AKfycbx2NThfv5Ob1_ZOk8qHb04hXMhve0VFXKvKPgLGhqFWKH4VHy_jTkaikrqWetDsOAQutA/exec";
+    // ----------------------------------
 
-    async function enviarReporte() {
-        const resp = document.getElementById('responsable').value;
-        if (!resp) return alert("Por favor, ingresa tu nombre");
+    async function procesarEnvio() {
+        let nombre = document.getElementById('campoNombre').value;
+        if (!nombre) return alert("⚠️ Por favor, escribe tu nombre antes de enviar.");
 
-        document.getElementById('overlay').style.display = 'flex';
+        // Activar pantalla de carga
+        document.getElementById('overlay-carga').style.display = 'flex';
 
-        // Procesar fotos a Base64
-        const fotos = [];
-        const files = document.getElementById('fotos').files;
-        for (let f of files) {
-            const b64 = await new Promise(res => {
-                const reader = new FileReader();
-                reader.onload = () => res({ data: reader.result, mimeType: f.type });
-                reader.readAsDataURL(f);
-            });
-            fotos.push(b64);
+        // 1. Convertir Fotos a Base64
+        let inputFiles = document.getElementById('campoFotos');
+        let fotosData = [];
+        
+        if (inputFiles.files.length > 0) {
+            for (let i = 0; i < inputFiles.files.length; i++) {
+                let file = inputFiles.files[i];
+                try {
+                    let base64 = await new Promise((resolve, reject) => {
+                        let reader = new FileReader();
+                        reader.onload = (e) => resolve({ data: e.target.result, mimeType: file.type });
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    });
+                    fotosData.push(base64);
+                } catch (e) {
+                    console.error("Error leyendo foto", e);
+                }
+            }
         }
 
-        const payload = {
-            responsable: resp,
+        // 2. Preparar el paquete de datos
+        let datos = {
+            responsable: nombre,
             checks: {
-                p1: document.getElementById('p1').checked ? "SI" : "NO",
-                p2: document.getElementById('p2').checked ? "SI" : "NO",
-                p3: document.getElementById('p3').checked ? "SI" : "NO",
-                p4: document.getElementById('p4').checked ? "SI" : "NO",
-                p5: document.getElementById('p5').checked ? "SI" : "NO",
-                p6: document.getElementById('p6').checked ? "SI" : "NO"
+                p1: document.getElementById('chk1').checked ? "SI" : "NO",
+                p2: document.getElementById('chk2').checked ? "SI" : "NO",
+                p3: document.getElementById('chk3').checked ? "SI" : "NO",
+                p4: document.getElementById('chk4').checked ? "SI" : "NO",
+                p5: document.getElementById('chk5').checked ? "SI" : "NO",
+                p6: document.getElementById('chk6').checked ? "SI" : "NO"
             },
-            fotos: fotos
+            fotos: fotosData
         };
 
+        // 3. Enviar a Google
         try {
-            // Enviamos con mode: 'no-cors' para evitar bloqueos del navegador
-            await fetch(WEB_APP_URL, {
+            await fetch(API_URL, {
                 method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify(payload)
+                mode: 'no-cors', // Necesario para evitar bloqueos de navegador
+                body: JSON.stringify(datos)
             });
             
-            alert("✅ Registro guardado en el Excel con éxito.");
-            location.reload();
+            // Como usamos no-cors, asumimos éxito si no hay error de red
+            alert("✅ ¡Reporte enviado con éxito!");
+            window.location.reload(); 
         } catch (error) {
-            alert("Error al enviar: " + error);
-            document.getElementById('overlay').style.display = 'none';
+            alert("❌ Error de conexión: " + error);
+            document.getElementById('overlay-carga').style.display = 'none';
         }
     }
 
-    let miChart = null;
+    // Lógica para Estadísticas
+    let miGrafico = null;
+
     async function cargarEstadisticas() {
         try {
-            const res = await fetch(WEB_APP_URL);
-            const data = await res.json();
+            let respuesta = await fetch(API_URL); // Petición GET normal
+            let datos = await respuesta.json();
             
-            const tbody = document.getElementById('tablaLogs');
+            // Llenar la tabla
+            let tbody = document.querySelector("#tabla-registros tbody");
             tbody.innerHTML = "";
-            const diasConteo = [0, 0, 0, 0, 0, 0, 0]; // D L M M J V S
+            
+            let conteoDias = [0,0,0,0,0,0,0]; // Domingo a Sábado
 
-            data.slice().reverse().forEach(row => {
-                const fecha = new Date(row.fecha);
-                diasConteo[fecha.getDay()]++;
-                tbody.innerHTML += `<tr><td>${fecha.toLocaleDateString()}</td><td>${row.responsable}</td></tr>`;
+            // Mostrar solo los últimos 10 y procesar para el gráfico
+            datos.slice().reverse().slice(0, 10).forEach(fila => {
+                let fecha = new Date(fila.fecha);
+                if (!isNaN(fecha)) {
+                    conteoDias[fecha.getDay()]++;
+                    tbody.innerHTML += `<tr>
+                        <td>${fecha.toLocaleDateString()}</td>
+                        <td>${fila.responsable}</td>
+                    </tr>`;
+                }
             });
 
-            if (miChart) miChart.destroy();
-            miChart = new Chart(document.getElementById('graficoSemanal'), {
+            // Si no hay datos
+            if(datos.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='2'>No hay registros aún.</td></tr>";
+            }
+
+            // Dibujar/Actualizar Gráfico
+            let ctx = document.getElementById('graficoBarras');
+            if (miGrafico) miGrafico.destroy();
+
+            miGrafico = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+                    labels: ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'],
                     datasets: [{
-                        label: 'Cierres',
-                        data: diasConteo,
-                        backgroundColor: '#0052cc',
+                        label: 'Cierres Realizados',
+                        data: conteoDias,
+                        backgroundColor: '#0d6efd',
                         borderRadius: 5
                     }]
                 },
                 options: {
                     responsive: true,
-                    plugins: { legend: { display: false } }
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
                 }
             });
+
         } catch (e) {
-            console.log("Esperando datos...");
+            console.error(e);
+            document.querySelector("#tabla-registros tbody").innerHTML = "<tr><td colspan='2' class='text-danger'>Error cargando datos. Revisa la consola.</td></tr>";
         }
     }
 </script>
-<script src="
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
