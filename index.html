@@ -3,207 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reporte Diario - Rent a Car</title>
+    <title>Control de Cierre | Rent a Car</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <style>
-        body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; padding: 20px; }
-        .main-container { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 600px; margin: auto; }
-        .header-title { color: #0d6efd; font-weight: bold; text-align: center; margin-bottom: 20px; }
-        .check-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f1f1; padding: 12px 0; }
-        .check-item:last-child { border-bottom: none; }
-        .btn-submit { width: 100%; padding: 14px; font-size: 1.1rem; font-weight: bold; margin-top: 25px; border-radius: 8px; }
-        
-        /* Pantalla de carga */
-        #loader { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:9999; align-items:center; justify-content:center; flex-direction:column; }
+        body { background-color: #f8f9fa; font-family: sans-serif; padding: 15px; }
+        .card-panel { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 600px; margin: auto; }
+        .stat-box { background: #f0f4f8; border-radius: 8px; padding: 10px; text-align: center; }
+        .stat-val { font-size: 1.8rem; font-weight: bold; color: #0d6efd; display: block; }
+        .falta-item { color: #dc3545; font-weight: bold; border-left: 4px solid #dc3545; padding-left: 10px; margin-bottom: 5px; list-style: none; }
+        .check-row { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 10px 0; }
+        #loader { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:99; align-items:center; justify-content:center; flex-direction:column; }
     </style>
 </head>
 <body>
 
 <div id="loader">
-    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div>
-    <h4 class="mt-3 text-primary fw-bold">Guardando reporte...</h4>
-    <p class="text-muted">Subiendo fotos y actualizando Excel</p>
+    <div class="spinner-border text-primary"></div>
+    <h5 class="mt-2">Enviando reporte...</h5>
 </div>
 
 <div class="container">
-    <ul class="nav nav-pills nav-fill mb-4 main-container p-2">
-        <li class="nav-item">
-            <button class="nav-link active fw-bold" data-bs-toggle="pill" data-bs-target="#tab-registro">📝 NUEVO REPORTE</button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link fw-bold" data-bs-toggle="pill" data-bs-target="#tab-stats" onclick="cargarGrafico()">📊 ESTADÍSTICAS</button>
-        </li>
+    <ul class="nav nav-pills nav-fill mb-3 card-panel p-2">
+        <li class="nav-item"><button class="nav-link active fw-bold" data-bs-toggle="pill" data-bs-target="#registro">📝 REGISTRO</button></li>
+        <li class="nav-item"><button class="nav-link fw-bold" data-bs-toggle="pill" data-bs-target="#control" onclick="calcularFaltas()">👮 CONTROL</button></li>
     </ul>
 
     <div class="tab-content">
-        
-        <div class="tab-pane fade show active" id="tab-registro">
-            <div class="main-container">
-                <h3 class="header-title">Cierre de Operaciones</h3>
+        <div class="tab-pane fade show active" id="registro">
+            <div class="card-panel">
+                <h4 class="text-center text-primary fw-bold mb-4">Cierre de Sucursal</h4>
+                <input type="text" id="nombre" class="form-control mb-3" placeholder="Tu nombre">
+                <div class="mb-3">
+                    <div class="check-row"><span>Pitbull en unidades</span><input type="checkbox" id="c1" class="form-check-input"></div>
+                    <div class="check-row"><span>Unidades cerradas</span><input type="checkbox" id="c2" class="form-check-input"></div>
+                    <div class="check-row"><span>Candados Bodega</span><input type="checkbox" id="c3" class="form-check-input"></div>
+                    <div class="check-row"><span>Estación Combustible</span><input type="checkbox" id="c4" class="form-check-input"></div>
+                    <div class="check-row"><span>Basura Lavado</span><input type="checkbox" id="c5" class="form-check-input"></div>
+                    <div class="check-row"><span>Patio Ordenado</span><input type="checkbox" id="c6" class="form-check-input"></div>
+                </div>
+                <input type="file" id="fotos" multiple accept="image/*" class="form-control mb-3">
+                <button class="btn btn-primary w-100 py-3 fw-bold" onclick="enviar()">ENVIAR AHORA</button>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="control">
+            <div class="card-panel">
+                <h4 class="text-center fw-bold mb-4">Monitor de Asistencia</h4>
                 
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Responsable:</label>
-                    <input type="text" id="inputNombre" class="form-control form-control-lg" placeholder="Escribe tu nombre" required>
+                <div class="row g-2 mb-4">
+                    <div class="col-6"><div class="stat-box"><span class="stat-val" id="mesTotal">0</span>Cierres este mes</div></div>
+                    <div class="col-6"><div class="stat-box"><span class="stat-val" id="semTotal">0</span>Esta semana</div></div>
                 </div>
 
-                <div class="card bg-light border-0 p-3 mb-3">
-                    <h6 class="text-muted fw-bold mb-2">Checklist Diario</h6>
-                    <div class="check-item"><span>🐶 Pitbull en unidades</span><input type="checkbox" id="chk1" class="form-check-input" style="transform: scale(1.3);"></div>
-                    <div class="check-item"><span>🚗 Unidades cerradas</span><input type="checkbox" id="chk2" class="form-check-input" style="transform: scale(1.3);"></div>
-                    <div class="check-item"><span>🔒 Candados Bodegas</span><input type="checkbox" id="chk3" class="form-check-input" style="transform: scale(1.3);"></div>
-                    <div class="check-item"><span>⛽ Estación Combustible</span><input type="checkbox" id="chk4" class="form-check-input" style="transform: scale(1.3);"></div>
-                    <div class="check-item"><span>🗑️ Basura Lavado</span><input type="checkbox" id="chk5" class="form-check-input" style="transform: scale(1.3);"></div>
-                    <div class="check-item"><span>🧹 Patio Ordenado</span><input type="checkbox" id="chk6" class="form-check-input" style="transform: scale(1.3);"></div>
+                <div id="seccionFaltas" style="display:none;">
+                    <h6 class="text-danger fw-bold">⚠️ DÍAS SIN CIERRE (Lun a Vie):</h6>
+                    <ul id="listaFaltas" class="ps-0"></ul>
+                    <p class="small text-muted">Estos días no se envió el formulario obligatorio.</p>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-bold">📸 Evidencia (Fotos):</label>
-                    <input type="file" id="inputFotos" multiple accept="image/*" class="form-control">
-                    <div class="form-text">Puedes subir varias fotos a la vez.</div>
+                <div id="todoOk" class="alert alert-success text-center" style="display:none;">
+                    ✅ ¡Excelente! No hay faltas registradas.
                 </div>
 
-                <button class="btn btn-primary btn-submit shadow-sm" onclick="enviarFormulario()">ENVIAR REPORTE</button>
+                <button class="btn btn-outline-secondary btn-sm w-100 mt-3" onclick="location.reload()">🔄 Actualizar Monitor</button>
             </div>
         </div>
-
-        <div class="tab-pane fade" id="tab-stats">
-            <div class="main-container text-center">
-                <h3 class="header-title">Resumen Semanal</h3>
-                <canvas id="miGrafico"></canvas>
-                <hr class="my-4">
-                <div class="table-responsive">
-                    <table class="table table-sm text-start" id="tablaLogs">
-                        <thead class="table-light"><tr><th>Fecha</th><th>Usuario</th></tr></thead>
-                        <tbody><tr><td colspan="2">Cargando datos...</td></tr></tbody>
-                    </table>
-                </div>
-                <button class="btn btn-outline-primary btn-sm mt-3" onclick="cargarGrafico()">🔄 Actualizar datos</button>
-            </div>
-        </div>
-
     </div>
 </div>
 
 <script>
-    // --- TU URL OFICIAL ---
-    const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbyBwqPLbAgJPEzQeiPkj1F0OsmW5xyJ77MYvmyQnNmT2xw9fY94ICyNQ4hz3MA6gBh8bw/exec";
-    // ----------------------
+    const API = "https://script.google.com/macros/s/AKfycbyBwqPLbAgJPEzQeiPkj1F0OsmW5xyJ77MYvmyQnNmT2xw9fY94ICyNQ4hz3MA6gBh8bw/exec";
 
-    async function enviarFormulario() {
-        const nombre = document.getElementById('inputNombre').value;
-        if (!nombre) return alert("⚠️ ¡Oye! Olvidaste poner tu nombre.");
+    async function enviar() {
+        const n = document.getElementById('nombre').value;
+        if(!n) return alert("Escribe tu nombre");
+        document.getElementById('loader').style.display='flex';
 
-        // Mostrar pantalla de carga
-        document.getElementById('loader').style.display = 'flex';
-
-        // 1. Convertir fotos a Base64
-        const archivos = document.getElementById('inputFotos').files;
-        let fotosData = [];
-        
-        if (archivos.length > 0) {
-            for (let i = 0; i < archivos.length; i++) {
-                let file = archivos[i];
-                try {
-                    let base64 = await new Promise((resolve) => {
-                        let reader = new FileReader();
-                        reader.onload = (e) => resolve({ data: e.target.result, mimeType: file.type });
-                        reader.readAsDataURL(file);
-                    });
-                    fotosData.push(base64);
-                } catch (err) {
-                    console.error("Error leyendo foto", err);
-                }
-            }
+        const fInput = document.getElementById('fotos').files;
+        let fData = [];
+        for(let file of fInput) {
+            let b64 = await new Promise(r => {
+                let rd = new FileReader();
+                rd.onload = e => r({data: e.target.result, mimeType: file.type});
+                rd.readAsDataURL(file);
+            });
+            fData.push(b64);
         }
 
-        // 2. Armar el paquete de datos
-        const paquete = {
-            responsable: nombre,
-            checks: {
-                p1: document.getElementById('chk1').checked ? "SI" : "NO",
-                p2: document.getElementById('chk2').checked ? "SI" : "NO",
-                p3: document.getElementById('chk3').checked ? "SI" : "NO",
-                p4: document.getElementById('chk4').checked ? "SI" : "NO",
-                p5: document.getElementById('chk5').checked ? "SI" : "NO",
-                p6: document.getElementById('chk6').checked ? "SI" : "NO"
-            },
-            fotos: fotosData
+        const payload = {
+            responsable: n,
+            checks: { p1:c1.checked?"SI":"NO", p2:c2.checked?"SI":"NO", p3:c3.checked?"SI":"NO", p4:c4.checked?"SI":"NO", p5:c5.checked?"SI":"NO", p6:c6.checked?"SI":"NO" },
+            fotos: fData
         };
 
-        // 3. Enviar a Google Script
-        try {
-            await fetch(GOOGLE_URL, {
-                method: 'POST',
-                mode: 'no-cors', // Necesario para que el navegador no bloquee el envío
-                body: JSON.stringify(paquete)
-            });
-
-            alert("✅ ¡Reporte enviado y guardado con éxito!");
-            window.location.reload(); // Recargar para limpiar
-        } catch (error) {
-            alert("❌ Error de conexión: " + error);
-            document.getElementById('loader').style.display = 'none';
-        }
+        fetch(API, {method:'POST', mode:'no-cors', body:JSON.stringify(payload)})
+        .then(() => { alert("Enviado correctamente"); location.reload(); });
     }
 
-    // --- LÓGICA DEL GRÁFICO ---
-    let chartInstance = null;
-
-    async function cargarGrafico() {
+    async function calcularFaltas() {
         try {
-            const response = await fetch(GOOGLE_URL);
-            const datos = await response.json();
+            const res = await fetch(API);
+            const data = await res.json();
             
-            const tbody = document.querySelector("#tablaLogs tbody");
-            tbody.innerHTML = "";
-            
-            let conteoSemana = [0,0,0,0,0,0,0]; // Dom - Sab
+            const fechasHechas = data.map(r => new Date(r.fecha).toLocaleDateString());
+            let hoy = new Date();
+            let mesCount = 0;
+            let semCount = 0;
+            let faltasArr = [];
 
-            // Mostrar solo los últimos 10 registros
-            datos.slice().reverse().slice(0, 10).forEach(fila => {
-                let fecha = new Date(fila.fecha);
-                if (!isNaN(fecha)) {
-                    conteoSemana[fecha.getDay()]++;
-                    tbody.innerHTML += `<tr>
-                        <td>${fecha.toLocaleDateString()}</td>
-                        <td>${fila.responsable}</td>
-                    </tr>`;
-                }
+            // 1. Contar mes y semana
+            data.forEach(r => {
+                let d = new Date(r.fecha);
+                if(d.getMonth() === hoy.getMonth()) mesCount++;
+                // Semana aproximada (últimos 7 días)
+                if((hoy - d) / (1000*3600*24) <= 7) semCount++;
             });
 
-            if (datos.length === 0) tbody.innerHTML = "<tr><td colspan='2'>No hay registros.</td></tr>";
+            document.getElementById('mesTotal').innerText = mesCount;
+            document.getElementById('semTotal').innerText = semCount;
 
-            // Dibujar gráfico
-            const ctx = document.getElementById('miGrafico');
-            if (chartInstance) chartInstance.destroy();
-
-            chartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
-                    datasets: [{
-                        label: 'Reportes Entregados',
-                        data: conteoSemana,
-                        backgroundColor: '#0d6efd',
-                        borderRadius: 5
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+            // 2. Buscar qué días laborales faltan
+            let iter = new Date(hoy.getFullYear(), hoy.getMonth(), 1); // 1 de este mes
+            while(iter < hoy) {
+                let diaSem = iter.getDay(); // 0=Dom, 1=Lun... 5=Vie, 6=Sab
+                if(diaSem >= 1 && diaSem <= 5) { // Solo Lunes a Viernes
+                    let s = iter.toLocaleDateString();
+                    if(!fechasHechas.includes(s)) {
+                        faltasArr.push(s);
+                    }
                 }
-            });
+                iter.setDate(iter.getDate() + 1);
+            }
 
-        } catch (e) {
-            console.error(e);
-            document.querySelector("#tablaLogs tbody").innerHTML = "<tr><td colspan='2' class='text-danger'>Error cargando estadísticas.</td></tr>";
-        }
+            const lista = document.getElementById('listaFaltas');
+            lista.innerHTML = "";
+            if(faltasArr.length > 0) {
+                document.getElementById('seccionFaltas').style.display = 'block';
+                document.getElementById('todoOk').style.display = 'none';
+                faltasArr.forEach(f => {
+                    lista.innerHTML += `<li class="falta-item">${f}</li>`;
+                });
+            } else {
+                document.getElementById('seccionFaltas').style.display = 'none';
+                document.getElementById('todoOk').style.display = 'block';
+            }
+
+        } catch(e) { console.error(e); }
     }
 </script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
