@@ -3,171 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Cierres - Rent a Car</title>
+    <title>Gestión Rent a Car</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        body { background-color: #f4f6f9; font-family: 'Segoe UI', system-ui, sans-serif; padding: 15px; }
-        .main-card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); max-width: 600px; margin: auto; border: none; }
+        body { background-color: #ebedef; font-family: 'Segoe UI', system-ui, sans-serif; padding: 20px; }
+        .main-container { background: white; border-radius: 15px; padding: 30px; box-shadow: 0 8px 30px rgba(0,0,0,0.05); max-width: 650px; margin: auto; }
         
-        /* Navegación moderna */
-        .nav-pills { background: #f1f3f5; padding: 5px; border-radius: 15px; }
-        .nav-pills .nav-link { border-radius: 12px; font-weight: 600; color: #6c757d; transition: all 0.3s; }
-        .nav-pills .nav-link.active { background-color: #ffffff; color: #0d6efd; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .nav-link.stats-tab.active { color: #0d6efd !important; }
+        /* Navegación */
+        .nav-pills { background: #f8f9fa; padding: 5px; border-radius: 12px; margin-bottom: 25px; }
+        .nav-pills .nav-link { color: #495057; font-weight: 600; border-radius: 10px; transition: all 0.3s; }
+        .nav-pills .nav-link.active { background-color: #fff; color: #0d6efd; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
-        /* Estilos del Formulario */
-        .check-item { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px dashed #e9ecef; align-items: center; }
+        /* Formulario */
+        .check-group { background: #f8f9fa; border-radius: 12px; padding: 15px; margin-bottom: 20px; }
+        .check-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed #dee2e6; }
         .check-item:last-child { border-bottom: none; }
-        .form-check-input { width: 1.5em; height: 1.5em; border-color: #ced4da; cursor: pointer; }
-        .form-check-input:checked { background-color: #0d6efd; border-color: #0d6efd; }
+        .form-check-input { width: 1.6em; height: 1.6em; cursor: pointer; }
 
-        /* Tarjetas de Estadísticas */
-        .kpi-card { background: #f8f9fa; border-radius: 15px; padding: 15px; margin-bottom: 15px; border: 1px solid #e9ecef; }
-        .kpi-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #8898aa; font-weight: 700; }
-        .kpi-value { font-size: 1.8rem; font-weight: 800; color: #32325d; }
-        
-        /* Barras de Progreso */
-        .progress { height: 10px; border-radius: 5px; background-color: #e9ecef; margin-top: 10px; }
-        
-        /* Alertas de Falta */
-        .missing-day-card { background: #fff5f5; border-left: 5px solid #dc3545; padding: 12px; margin-bottom: 10px; border-radius: 8px; display: flex; align-items: center; }
-        .missing-icon { font-size: 1.5rem; color: #dc3545; margin-right: 15px; }
-        .missing-text { color: #525f7f; font-weight: 600; }
+        /* Estadísticas */
+        .stat-card { border: 1px solid #e9ecef; border-radius: 12px; padding: 20px; text-align: center; background: #fff; height: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .stat-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #6c757d; font-weight: 700; margin-bottom: 10px; }
+        .stat-percent { font-size: 2.5rem; font-weight: 800; line-height: 1; margin-bottom: 10px; }
+        .stat-detail { font-size: 0.85rem; color: #adb5bd; }
 
+        /* Faltas */
+        .missing-row { display: flex; align-items: center; background: #fff5f5; border-left: 4px solid #dc3545; padding: 12px; margin-bottom: 8px; border-radius: 6px; }
+        .missing-date { font-weight: 700; color: #495057; margin-left: 10px; }
+        
         /* Loader */
-        #loader { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.98); z-index:9999; align-items:center; justify-content:center; flex-direction:column; }
+        #loader { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.95); z-index:9999; align-items:center; justify-content:center; flex-direction:column; }
     </style>
 </head>
 <body>
 
 <div id="loader">
-    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
-    <h5 class="mt-4 fw-bold text-dark">Enviando Cierre...</h5>
+    <div class="spinner-grow text-primary" role="status"></div>
+    <h5 class="mt-3 fw-bold">Procesando información...</h5>
 </div>
 
 <div class="container">
-    <ul class="nav nav-pills nav-fill mb-4 main-card p-2">
-        <li class="nav-item">
-            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-registro">
-                <i class="fa-solid fa-clipboard-check me-2"></i>REGISTRO
-            </button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link stats-tab" data-bs-toggle="pill" data-bs-target="#tab-stats" onclick="cargarEstadisticas()">
-                <i class="fa-solid fa-chart-pie me-2"></i>ESTADÍSTICAS
-            </button>
-        </li>
-    </ul>
-
-    <div class="tab-content">
+    <div class="main-container">
         
-        <div class="tab-pane fade show active" id="tab-registro">
-            <div class="main-card">
-                <div class="text-center mb-4">
-                    <h3 class="fw-bold text-dark">Cierre de Operaciones</h3>
-                    <p class="text-muted small">Complete el formulario obligatorio de Lunes a Viernes</p>
-                </div>
+        <ul class="nav nav-pills nav-fill">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-registro">
+                    <i class="fa-solid fa-pen-to-square me-2"></i>REGISTRO
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-stats" onclick="cargarKPIs()">
+                    <i class="fa-solid fa-chart-simple me-2"></i>ESTADÍSTICAS GESTIÓN
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            
+            <div class="tab-pane fade show active" id="tab-registro">
+                <h3 class="text-center fw-bold mb-4 text-dark">Nuevo Cierre</h3>
                 
                 <div class="mb-4">
-                    <label class="fw-bold mb-2 text-dark">Responsable:</label>
-                    <input type="text" id="nombre" class="form-control form-control-lg bg-light border-0" placeholder="Escribe tu nombre">
+                    <label class="fw-bold mb-2 text-muted small">RESPONSABLE</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-0"><i class="fa-solid fa-user text-primary"></i></span>
+                        <input type="text" id="nombre" class="form-control bg-light border-0 py-3" placeholder="Nombre completo">
+                    </div>
                 </div>
 
-                <div class="p-3 mb-4 rounded-3" style="background-color: #f8f9fa;">
-                    <h6 class="text-primary fw-bold mb-3"><i class="fa-solid fa-list-check me-2"></i>Checklist Diario</h6>
-                    <div class="check-item"><span class="fw-medium"><i class="fa-solid fa-dog me-2 text-muted"></i>Pitbull en unidades</span><input type="checkbox" id="c1" class="form-check-input"></div>
-                    <div class="check-item"><span class="fw-medium"><i class="fa-solid fa-car me-2 text-muted"></i>Unidades cerradas</span><input type="checkbox" id="c2" class="form-check-input"></div>
-                    <div class="check-item"><span class="fw-medium"><i class="fa-solid fa-lock me-2 text-muted"></i>Candados Bodega</span><input type="checkbox" id="c3" class="form-check-input"></div>
-                    <div class="check-item"><span class="fw-medium"><i class="fa-solid fa-gas-pump me-2 text-muted"></i>Combustible</span><input type="checkbox" id="c4" class="form-check-input"></div>
-                    <div class="check-item"><span class="fw-medium"><i class="fa-solid fa-trash me-2 text-muted"></i>Basura Lavado</span><input type="checkbox" id="c5" class="form-check-input"></div>
-                    <div class="check-item"><span class="fw-medium"><i class="fa-solid fa-broom me-2 text-muted"></i>Patio Ordenado</span><input type="checkbox" id="c6" class="form-check-input"></div>
+                <div class="check-group">
+                    <label class="fw-bold mb-3 text-muted small">CHECKLIST OPERATIVO</label>
+                    <div class="check-item"><span>🐶 Pitbull en unidades</span><input type="checkbox" id="c1" class="form-check-input"></div>
+                    <div class="check-item"><span>🚗 Unidades cerradas</span><input type="checkbox" id="c2" class="form-check-input"></div>
+                    <div class="check-item"><span>🔒 Candados Bodega</span><input type="checkbox" id="c3" class="form-check-input"></div>
+                    <div class="check-item"><span>⛽ Combustible</span><input type="checkbox" id="c4" class="form-check-input"></div>
+                    <div class="check-item"><span>🗑️ Basura Lavado</span><input type="checkbox" id="c5" class="form-check-input"></div>
+                    <div class="check-item"><span>🧹 Patio Ordenado</span><input type="checkbox" id="c6" class="form-check-input"></div>
                 </div>
 
                 <div class="mb-4">
-                    <label class="fw-bold mb-2">📸 Evidencia Fotográfica:</label>
+                    <label class="fw-bold mb-2 text-muted small">EVIDENCIA</label>
                     <input type="file" id="fotos" multiple accept="image/*" class="form-control">
                 </div>
 
-                <button class="btn btn-primary w-100 py-3 fw-bold rounded-pill shadow" onclick="enviarReporte()">
-                    ENVIAR REPORTE <i class="fa-solid fa-paper-plane ms-2"></i>
+                <button class="btn btn-primary w-100 py-3 fw-bold rounded-3 shadow-sm" onclick="enviar()">
+                    ENVIAR REPORTE
                 </button>
             </div>
-        </div>
 
-        <div class="tab-pane fade" id="tab-stats">
-            <div class="main-card">
-                <h4 class="text-center fw-bold mb-4">Gestión de Cumplimiento</h4>
-                
-                <div id="loadingStats" class="text-center text-primary fw-bold my-5">
-                    <div class="spinner-border spinner-border-sm me-2"></div>Calculando eficiencia...
+            <div class="tab-pane fade" id="tab-stats">
+                <h4 class="text-center fw-bold mb-4">Tu Gestión de Cierre</h4>
+
+                <div id="loadingStats" class="text-center py-5">
+                    <div class="spinner-border text-primary"></div>
+                    <p class="mt-2 text-muted">Calculando indicadores...</p>
                 </div>
 
                 <div id="panelStats" style="display:none;">
+                    
                     <div class="row g-3 mb-4">
                         <div class="col-6">
-                            <div class="kpi-card text-center">
-                                <div class="kpi-title">Semanal</div>
-                                <div class="kpi-value" id="percentWeek">0%</div>
-                                <div class="progress">
-                                    <div id="barWeek" class="progress-bar bg-primary" role="progressbar" style="width: 0%"></div>
+                            <div class="stat-card">
+                                <div class="stat-label">Semana Actual</div>
+                                <div class="stat-percent" id="kpiWeek">0%</div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar" id="barWeek" style="width: 0%"></div>
                                 </div>
-                                <small class="text-muted d-block mt-2" id="textWeek">0/0 días</small>
+                                <div class="stat-detail mt-2" id="txtWeek">0/0 días</div>
                             </div>
                         </div>
                         <div class="col-6">
-                            <div class="kpi-card text-center">
-                                <div class="kpi-title">Mensual</div>
-                                <div class="kpi-value" id="percentMonth">0%</div>
-                                <div class="progress">
-                                    <div id="barMonth" class="progress-bar bg-primary" role="progressbar" style="width: 0%"></div>
+                            <div class="stat-card">
+                                <div class="stat-label">Mes Actual</div>
+                                <div class="stat-percent" id="kpiMonth">0%</div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar" id="barMonth" style="width: 0%"></div>
                                 </div>
-                                <small class="text-muted d-block mt-2" id="textMonth">0/0 días</small>
+                                <div class="stat-detail mt-2" id="txtMonth">0/0 días</div>
                             </div>
                         </div>
                     </div>
 
-                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">
-                        <i class="fa-regular fa-calendar-xmark me-2 text-danger"></i>Días sin cierre (Pendientes)
-                    </h6>
-                    
-                    <div id="lista-faltas-container"></div>
-                    
-                    <div id="panel-ok" class="alert alert-success text-center mt-3" style="display:none;">
-                        <i class="fa-solid fa-circle-check fa-2x mb-2"></i><br>
-                        ¡Excelente gestión! <br>Cumplimiento al 100%.
+                    <div class="mt-4">
+                        <h6 class="fw-bold text-danger mb-3"><i class="fa-solid fa-triangle-exclamation me-2"></i>Días sin realizar cierre</h6>
+                        <div id="listaFaltas"></div>
+                        
+                        <div id="okMessage" class="alert alert-success text-center py-4" style="display:none;">
+                            <i class="fa-solid fa-medal fa-3x mb-3 text-success"></i>
+                            <h5 class="fw-bold">¡Gestión Impecable!</h5>
+                            <p class="mb-0">Has realizado el cierre todos los días hábiles.</p>
+                        </div>
                     </div>
 
-                    <div class="alert alert-light text-center small mt-3 text-muted">
-                        <i class="fa-solid fa-circle-info me-1"></i> La efectividad se calcula sobre días hábiles (Lun-Vie).
+                    <div class="alert alert-light text-center small text-muted mt-3">
+                        * La efectividad se mide sobre días hábiles (Lunes a Viernes) transcurridos hasta hoy.
                     </div>
                 </div>
 
-                <button class="btn btn-outline-primary w-100 rounded-pill mt-2" onclick="cargarEstadisticas()">
-                    <i class="fa-solid fa-rotate me-2"></i>Actualizar Datos
-                </button>
+                <button class="btn btn-outline-secondary w-100 mt-2" onclick="cargarKPIs()">Actualizar Tablero</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // URL DE TU VERSIÓN 20 (LA QUE FUNCIONA)
+    // --- PEGA AQUÍ TU URL DE LA VERSIÓN 20 ---
     const API_URL = "https://script.google.com/macros/s/AKfycbxniGLGKiiJCFjkrZDt90Xiw9Cfqk5xCcxFDEMkqWZ_WYaSmLortp3ertE8jLDFZ0GvGw/exec";
 
-    // --- FUNCIÓN DE ENVÍO ---
-    async function enviarReporte() {
+    // --- FUNCIÓN ENVIAR ---
+    async function enviar() {
         const nom = document.getElementById('nombre').value.trim();
-        if(!nom) return alert("⚠️ Por favor, indica quién es el responsable.");
+        if(!nom) return alert("⚠️ Falta el nombre del responsable.");
         
         document.getElementById('loader').style.display = 'flex';
 
-        const inputFiles = document.getElementById('fotos').files;
+        // Fotos
+        const files = document.getElementById('fotos').files;
         let fotosData = [];
-        
-        if(inputFiles.length > 0) {
-            for(let f of inputFiles) {
+        if(files.length > 0) {
+            for(let f of files) {
                 try {
                     let b64 = await new Promise(r => {
                         let reader = new FileReader();
@@ -175,7 +170,7 @@
                         reader.readAsDataURL(f);
                     });
                     fotosData.push(b64);
-                } catch(e) { console.error("Error foto"); }
+                } catch(e) {}
             }
         }
 
@@ -195,19 +190,19 @@
         try {
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
             
-            // --- MENSAJE SOLICITADO EXACTO ---
+            // --- MENSAJE EXACTO SOLICITADO ---
             alert("EL CIERRE SE HA ENVIADO DE FORMA EXITOSA");
             // ---------------------------------
             
             window.location.reload();
         } catch(e) {
-            alert("Hubo un error de conexión.");
+            alert("Error de conexión.");
             document.getElementById('loader').style.display = 'none';
         }
     }
 
-    // --- FUNCIÓN DE ESTADÍSTICAS Y KPI ---
-    async function cargarEstadisticas() {
+    // --- FUNCIÓN ESTADÍSTICAS ---
+    async function cargarKPIs() {
         document.getElementById('loadingStats').style.display = 'block';
         document.getElementById('panelStats').style.display = 'none';
 
@@ -215,93 +210,82 @@
             const res = await fetch(API_URL);
             const registros = await res.json();
             
-            // Fechas completadas (String formato local)
-            const hechas = registros.map(r => new Date(r.fecha).toLocaleDateString());
-            
+            // Convertimos las fechas del Excel a un formato limpio "DD/MM/YYYY" para comparar
+            const fechasCompletadas = registros.map(r => {
+                let d = new Date(r.fecha);
+                return d.toLocaleDateString(); // Esto quita la hora y deja solo la fecha local
+            });
+
             let hoy = new Date();
             let mesActual = hoy.getMonth();
             let anioActual = hoy.getFullYear();
             
-            // --- VARIABLES PARA KPI ---
-            let diasHabilesMes = 0;
-            let diasCumplidosMes = 0;
-            
-            let diasHabilesSemana = 0;
-            let diasCumplidosSemana = 0;
-            
-            let faltas = [];
-            
-            // Calcular Lunes de esta semana
-            let diaSemanaHoy = hoy.getDay(); // 0 Dom, 1 Lun
-            let diff = hoy.getDate() - diaSemanaHoy + (diaSemanaHoy == 0 ? -6 : 1); 
-            let lunesSemana = new Date(hoy.setDate(diff));
-            lunesSemana.setHours(0,0,0,0);
-            
-            // Restaurar HOY para el bucle
-            hoy = new Date(); 
+            // Calcular inicio de semana (Lunes)
+            let diaSem = hoy.getDay(); 
+            let diff = hoy.getDate() - diaSem + (diaSem == 0 ? -6 : 1);
+            let lunesSemana = new Date(hoy.setDate(diff)); 
+            hoy = new Date(); // Resetear hoy
 
-            // Bucle desde el día 1 del mes hasta ayer (para ser justos con la estadistica)
-            // O hasta HOY si queremos tiempo real. Usaremos hasta HOY.
+            // Contadores
+            let totalDiasMes = 0, hechosMes = 0;
+            let totalDiasSem = 0, hechosSem = 0;
+            let listaFaltas = [];
+
+            // Recorrer desde día 1 del mes hasta HOY
             let iter = new Date(anioActual, mesActual, 1);
             
             while(iter <= hoy) {
-                let dSem = iter.getDay();
-                let fechaStr = iter.toLocaleDateString();
-                let esSemanaActual = iter >= lunesSemana;
+                // Solo contamos Lunes(1) a Viernes(5)
+                let dS = iter.getDay();
+                if(dS >= 1 && dS <= 5) {
+                    let fechaStr = iter.toLocaleDateString();
+                    let realizado = fechasCompletadas.includes(fechaStr);
+                    let nombreDia = iter.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric' });
+                    nombreDia = nombreDia.charAt(0).toUpperCase() + nombreDia.slice(1);
 
-                // Solo Lunes(1) a Viernes(5)
-                if(dSem >= 1 && dSem <= 5) {
+                    // Calculo Mensual
+                    totalDiasMes++;
+                    if(realizado) hechosMes++;
+
+                    // Calculo Semanal (si la fecha iterada es >= al lunes de esta semana)
+                    // Truco simple: comparar timestamps ignorando hora
+                    let tIter = new Date(iter.getFullYear(), iter.getMonth(), iter.getDate()).getTime();
+                    let tLunes = new Date(lunesSemana.getFullYear(), lunesSemana.getMonth(), lunesSemana.getDate()).getTime();
                     
-                    // KPI MES
-                    diasHabilesMes++;
-                    if(hechas.includes(fechaStr)) {
-                        diasCumplidosMes++;
-                    }
-                    
-                    // KPI SEMANA
-                    if(esSemanaActual) {
-                        diasHabilesSemana++;
-                        if(hechas.includes(fechaStr)) {
-                            diasCumplidosSemana++;
-                        }
+                    if(tIter >= tLunes) {
+                        totalDiasSem++;
+                        if(realizado) hechosSem++;
                     }
 
-                    // DETECTAR FALTAS (Si no está hecho y no es hoy - o sí es hoy si queremos ser estrictos)
-                    // Nota: Si hoy no han cerrado aun, bajará el porcentaje, eso está bien para que se apuren.
-                    if(!hechas.includes(fechaStr)) {
-                        // Opcional: Si es HOY, no lo muestres como falta en la lista roja todavía, pero sí afecta al %
-                        if(fechaStr !== hoy.toLocaleDateString()) {
-                            let nombreDia = iter.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric' });
-                            nombreDia = nombreDia.charAt(0).toUpperCase() + nombreDia.slice(1);
-                            faltas.push(nombreDia);
-                        }
+                    // Faltas (Si no está hecho y no es hoy - o si quieres ser estricto, incluye hoy)
+                    if(!realizado) {
+                        // Si quieres que HOY aparezca como falta si aun no lo hacen, quita el 'if'
+                        // Dejaremos que hoy aparezca como falta para que baje el porcentaje y se motiven
+                         listaFaltas.push(nombreDia);
                     }
                 }
                 iter.setDate(iter.getDate() + 1);
             }
 
-            // --- RENDERIZAR GRÁFICOS ---
-            actualizarGrafico('Week', diasCumplidosSemana, diasHabilesSemana);
-            actualizarGrafico('Month', diasCumplidosMes, diasHabilesMes);
+            // Pintar Gráficos
+            pintarKPI('Week', hechosSem, totalDiasSem);
+            pintarKPI('Month', hechosMes, totalDiasMes);
 
-            // --- RENDERIZAR LISTA FALTAS ---
-            const contenedorFaltas = document.getElementById('lista-faltas-container');
-            contenedorFaltas.innerHTML = "";
-
-            if(faltas.length > 0) {
-                faltas.forEach(f => {
-                    contenedorFaltas.innerHTML += `
-                    <div class="missing-day-card">
-                        <i class="fa-regular fa-calendar-xmark missing-icon"></i>
-                        <div>
-                            <div class="missing-text">${f}</div>
-                            <small class="text-danger">No se registró cierre</small>
-                        </div>
+            // Pintar Lista
+            const divFaltas = document.getElementById('listaFaltas');
+            divFaltas.innerHTML = "";
+            
+            if(listaFaltas.length > 0) {
+                listaFaltas.forEach(dia => {
+                    divFaltas.innerHTML += `
+                    <div class="missing-row">
+                        <i class="fa-regular fa-calendar-xmark text-danger fa-lg"></i>
+                        <span class="missing-date">${dia}</span>
                     </div>`;
                 });
-                document.getElementById('panel-ok').style.display = 'none';
+                document.getElementById('okMessage').style.display = 'none';
             } else {
-                document.getElementById('panel-ok').style.display = 'block';
+                document.getElementById('okMessage').style.display = 'block';
             }
 
             document.getElementById('loadingStats').style.display = 'none';
@@ -309,37 +293,29 @@
 
         } catch(e) {
             console.error(e);
-            alert("Error calculando estadísticas.");
+            alert("No se pudieron cargar los datos.");
         }
     }
 
-    function actualizarGrafico(tipo, cumplidos, totales) {
-        if(totales === 0) totales = 1; // Evitar división por cero
-        let porcentaje = Math.round((cumplidos / totales) * 100);
+    function pintarKPI(tipo, hechos, total) {
+        if(total === 0) total = 1;
+        let pct = Math.round((hechos / total) * 100);
         
-        let elVal = document.getElementById('percent' + tipo);
-        let elBar = document.getElementById('bar' + tipo);
-        let elTxt = document.getElementById('text' + tipo);
+        let color = 'bg-danger';
+        let txtColor = 'text-danger';
+        if(pct >= 50) { color = 'bg-warning'; txtColor = 'text-warning'; }
+        if(pct >= 90) { color = 'bg-success'; txtColor = 'text-success'; }
 
-        elVal.innerText = porcentaje + "%";
-        elBar.style.width = porcentaje + "%";
-        elTxt.innerText = `${cumplidos} de ${totales} días hábiles`;
+        document.getElementById('kpi'+tipo).innerText = pct + "%";
+        document.getElementById('kpi'+tipo).className = "stat-percent " + txtColor;
+        
+        let barra = document.getElementById('bar'+tipo);
+        barra.style.width = pct + "%";
+        barra.className = "progress-bar " + color;
 
-        // Colores según desempeño
-        elVal.classList.remove('text-success', 'text-warning', 'text-danger');
-        elBar.classList.remove('bg-success', 'bg-warning', 'bg-danger');
-
-        if(porcentaje >= 90) {
-            elVal.classList.add('text-success');
-            elBar.classList.add('bg-success');
-        } else if(porcentaje >= 50) {
-            elVal.classList.add('text-warning');
-            elBar.classList.add('bg-warning');
-        } else {
-            elVal.classList.add('text-danger');
-            elBar.classList.add('bg-danger');
-        }
+        document.getElementById('txt'+tipo).innerText = `${hechos} de ${total} días hábiles`;
     }
 </script>
 </body>
 </html>
+
