@@ -3,154 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Control - Rent a Car</title>
+    <title>Control Rent a Car</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
     <style>
-        body { background-color: #f4f7f6; font-family: 'Segoe UI', sans-serif; padding: 15px; }
-        .contenedor { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 600px; margin: auto; }
-        .titulo { color: #0d6efd; font-weight: bold; text-align: center; margin-bottom: 20px; }
-        .stat-box { background: #e9ecef; border-radius: 10px; padding: 15px; text-align: center; margin-bottom: 15px; }
-        .stat-num { font-size: 2rem; font-weight: bold; color: #0d6efd; display: block; }
-        .lista-faltas { background: #fff5f5; border: 1px solid #feb2b2; border-radius: 10px; padding: 15px; margin-top: 20px; }
-        .item-falta { color: #c53030; font-weight: bold; border-left: 4px solid #c53030; padding-left: 10px; margin-bottom: 8px; list-style: none; }
-        .check-row { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 10px 0; }
-        #overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.85); z-index:999; align-items:center; justify-content:center; flex-direction:column; }
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 15px; }
+        .contenedor { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 550px; margin: auto; }
+        
+        /* Estilos de Navegación */
+        .nav-pills .nav-link { font-weight: bold; color: #555; border: 1px solid #eee; margin: 0 5px; border-radius: 8px; }
+        .nav-pills .nav-link.active { background-color: #0d6efd; color: white; border-color: #0d6efd; }
+        .nav-link.danger-tab.active { background-color: #dc3545 !important; border-color: #dc3545 !important; }
+        
+        /* Estilos del Formulario */
+        .check-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f1f1; padding: 12px 0; }
+        .check-item:last-child { border-bottom: none; }
+        .form-check-input { width: 1.4em; height: 1.4em; }
+        
+        /* Estilos del Control de Faltas */
+        .falta-card { border-left: 5px solid #dc3545; background-color: #fff5f5; padding: 15px; margin-bottom: 10px; border-radius: 4px; }
+        .falta-fecha { color: #dc3545; font-weight: bold; font-size: 1.1rem; }
+        .stat-box { text-align: center; padding: 15px; background: #e9ecef; border-radius: 8px; margin-bottom: 15px; }
+        .stat-val { font-size: 2rem; font-weight: bold; color: #0d6efd; display: block; line-height: 1; }
+
+        /* Pantalla de Carga */
+        #loader { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:9999; align-items:center; justify-content:center; flex-direction:column; }
     </style>
 </head>
 <body>
 
-<div id="overlay">
+<div id="loader">
     <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div>
-    <h5 class="mt-3 fw-bold">Enviando Reporte...</h5>
+    <h4 class="mt-3 text-primary fw-bold">Procesando...</h4>
+    <p class="text-muted small">Subiendo evidencia y guardando datos</p>
 </div>
 
 <div class="container">
-    <ul class="nav nav-tabs nav-fill mb-4 contenedor p-2" role="tablist">
-        <li class="nav-item"><button class="nav-link active fw-bold" data-bs-toggle="tab" data-bs-target="#form-tab">📝 REGISTRO</button></li>
-        <li class="nav-item"><button class="nav-link fw-bold text-danger" data-bs-toggle="tab" data-bs-target="#control-tab" onclick="generarReporteControl()">👮 CONTROL DE FALTAS</button></li>
+    <ul class="nav nav-pills nav-fill mb-4 p-2 bg-white rounded-3 shadow-sm">
+        <li class="nav-item">
+            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-registro">📝 REGISTRO</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link text-danger fw-bold" data-bs-toggle="pill" data-bs-target="#tab-control" onclick="calcularFaltas()">👮 CONTROL DE FALTAS</button>
+        </li>
     </ul>
 
     <div class="tab-content">
-        <div class="tab-pane fade show active" id="form-tab">
+        
+        <div class="tab-pane fade show active" id="tab-registro">
             <div class="contenedor">
-                <h3 class="titulo">Cierre de Operaciones</h3>
+                <h3 class="text-center fw-bold mb-4" style="color: #0d6efd;">Cierre Diario</h3>
+                
                 <div class="mb-3">
                     <label class="fw-bold">Responsable:</label>
-                    <input type="text" id="nombre" class="form-control" placeholder="Escribe tu nombre">
+                    <input type="text" id="nombre" class="form-control form-control-lg" placeholder="Nombre completo">
                 </div>
-                <div class="mb-3">
-                    <div class="check-row"><span>🐶 Pitbull en unidades</span><input type="checkbox" id="p1" class="form-check-input"></div>
-                    <div class="check-row"><span>🚗 Unidades cerradas</span><input type="checkbox" id="p2" class="form-check-input"></div>
-                    <div class="check-row"><span>🔒 Candados Bodega</span><input type="checkbox" id="p3" class="form-check-input"></div>
-                    <div class="check-row"><span>⛽ Estación Combustible</span><input type="checkbox" id="p4" class="form-check-input"></div>
-                    <div class="check-row"><span>🗑️ Basura Lavado</span><input type="checkbox" id="p5" class="form-check-input"></div>
-                    <div class="check-row"><span>🧹 Patio Ordenado</span><input type="checkbox" id="p6" class="form-check-input"></div>
+
+                <div class="card p-3 border-0 bg-light mb-4">
+                    <h6 class="text-muted fw-bold border-bottom pb-2">Checklist Operativo</h6>
+                    <div class="check-item"><span>🐶 Pitbull en unidades</span><input type="checkbox" id="c1" class="form-check-input"></div>
+                    <div class="check-item"><span>🚗 Unidades cerradas</span><input type="checkbox" id="c2" class="form-check-input"></div>
+                    <div class="check-item"><span>🔒 Candados Bodega</span><input type="checkbox" id="c3" class="form-check-input"></div>
+                    <div class="check-item"><span>⛽ Estación Combustible</span><input type="checkbox" id="c4" class="form-check-input"></div>
+                    <div class="check-item"><span>🗑️ Basura Lavado</span><input type="checkbox" id="c5" class="form-check-input"></div>
+                    <div class="check-item"><span>🧹 Patio Ordenado</span><input type="checkbox" id="c6" class="form-check-input"></div>
                 </div>
-                <div class="mb-3">
-                    <label class="fw-bold">Fotos Evidencia:</label>
+
+                <div class="mb-4">
+                    <label class="fw-bold">📸 Evidencia (Fotos):</label>
                     <input type="file" id="fotos" multiple accept="image/*" class="form-control">
                 </div>
-                <button class="btn btn-primary w-100 py-3 fw-bold" onclick="enviar()">ENVIAR CIERRE</button>
+
+                <button class="btn btn-primary w-100 py-3 fw-bold shadow" onclick="enviarReporte()">ENVIAR REPORTE</button>
             </div>
         </div>
 
-        <div class="tab-pane fade" id="control-tab">
+        <div class="tab-pane fade" id="tab-control">
             <div class="contenedor">
-                <h3 class="titulo" style="color:#c53030">Auditoría de Cumplimiento</h3>
+                <h4 class="text-center fw-bold text-danger mb-4">Auditoría de Cierres</h4>
                 
-                <div class="row">
-                    <div class="col-12">
-                        <div class="stat-box">
-                            <span class="stat-num" id="totalMes">0</span>
-                            <small class="fw-bold">Días registrados este mes</small>
-                        </div>
-                    </div>
+                <div class="stat-box">
+                    <span class="stat-val" id="totalMes">...</span>
+                    <small>Cierres realizados este mes</small>
                 </div>
 
-                <div id="seccionFaltas" style="display:none;">
-                    <div class="lista-faltas">
-                        <h6 class="fw-bold text-danger">⚠️ DÍAS LABORALES SIN CIERRE:</h6>
-                        <p class="small text-muted">Fechas (Lunes a Viernes) que no tienen registro en el Excel:</p>
-                        <ul id="listaFechas" class="ps-0"></ul>
-                    </div>
-                </div>
+                <div id="loadingControl" class="text-center text-muted my-4">Analizando calendario...</div>
 
-                <div id="todoAlDia" class="alert alert-success text-center mt-3" style="display:none;">
-                    ✅ ¡Excelente! Todos los cierres laborales están al día.
-                </div>
-
-                <button class="btn btn-outline-secondary w-100 mt-4" onclick="generarReporteControl()">🔄 Actualizar Auditoría</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    // URL DE TU VERSIÓN 16
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbW1x8IYKGGVeiBhJuGz4fRUB_32SvY5Uu94bv8Uf5mwkg_cJwNANlbUgyTz3vPnqlklg/exec";
-
-    async function enviar() {
-        const nom = document.getElementById('nombre').value;
-        if(!nom) return alert("Por favor, ingresa tu nombre");
-        
-        document.getElementById('overlay').style.display = 'flex';
-
-        const fileInput = document.getElementById('fotos').files;
-        let fotosArr = [];
-        for(let f of fileInput) {
-            let b64 = await new Promise(r => {
-                let rd = new FileReader();
-                rd.onload = e => r({data: e.target.result, mimeType: f.type});
-                rd.readAsDataURL(f);
-            });
-            fotosArr.push(b64);
-        }
-
-        const payload = {
-            responsable: nom,
-            checks: { 
-                p1: document.getElementById('p1').checked ? "SI":"NO",
-                p2: document.getElementById('p2').checked ? "SI":"NO",
-                p3: document.getElementById('p3').checked ? "SI":"NO",
-                p4: document.getElementById('p4').checked ? "SI":"NO",
-                p5: document.getElementById('p5').checked ? "SI":"NO",
-                p6: document.getElementById('p6').checked ? "SI":"NO"
-            },
-            fotos: fotosArr
-        };
-
-        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
-        .then(() => {
-            alert("✅ Registro guardado exitosamente.");
-            location.reload();
-        });
-    }
-
-    async function generarReporteControl() {
-        try {
-            const response = await fetch(SCRIPT_URL);
-            const data = await response.json();
-            
-            // 1. Obtener fechas que sí tienen registro (formato YYYY-MM-DD para comparar)
-            const hechas = data.map(r => {
-                let d = new Date(r.fecha);
-                return d.toISOString().split('T')[0];
-            });
-
-            let hoy = new Date();
-            let mesActual = hoy.getMonth();
-            let anioActual = hoy.getFullYear();
-            
-            let faltas = [];
-            let contadorMes = 0;
-
-            // 2. Recorrer desde el día 1 del mes hasta hoy
-            let iter = new Date(anioActual, mesActual, 1);
-            
-            while(iter <= hoy) {
-                let diaSem = iter.getDay(); // 0:Dom, 1:Lun... 5:Vie, 6:Sab
-                let fechaIso = iter.toISOString().split('T')[0];
-
-                // Solo nos importan Lunes a Viernes (1 a 5)
-                if(diaSem >= 1 && diaSem <= 5) {
-                    if(hechas.
+                <div id="panelFaltas" style="display:none;">
+                    <h6 class="fw-bold text-danger border-bottom pb-2 mb-3">⚠️ DÍAS LABORALES SIN CIERRE:</h6>
+                    <div id="listaFaltasContainer"></div>
+                    <div class="alert alert-warning mt-3 small">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Estas fechas corresponden a días <b>Lunes a Viernes</b> donde
