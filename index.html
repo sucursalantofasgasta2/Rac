@@ -3,30 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control Rent a Car</title>
+    <title>Rent a Car - Sistema de Control</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
     <style>
-        body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 15px; }
-        .contenedor { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 550px; margin: auto; }
-        
-        /* Estilos de Navegación */
-        .nav-pills .nav-link { font-weight: bold; color: #555; border: 1px solid #eee; margin: 0 5px; border-radius: 8px; }
+        body { background-color: #f4f7f6; font-family: 'Segoe UI', sans-serif; padding: 20px; }
+        .main-card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 600px; margin: auto; }
+        .nav-pills .nav-link { font-weight: bold; color: #555; border: 1px solid #ddd; margin: 0 5px; border-radius: 8px; }
         .nav-pills .nav-link.active { background-color: #0d6efd; color: white; border-color: #0d6efd; }
-        .nav-link.danger-tab.active { background-color: #dc3545 !important; border-color: #dc3545 !important; }
-        
-        /* Estilos del Formulario */
-        .check-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f1f1; padding: 12px 0; }
-        .check-item:last-child { border-bottom: none; }
-        .form-check-input { width: 1.4em; height: 1.4em; }
-        
-        /* Estilos del Control de Faltas */
-        .falta-card { border-left: 5px solid #dc3545; background-color: #fff5f5; padding: 15px; margin-bottom: 10px; border-radius: 4px; }
-        .falta-fecha { color: #dc3545; font-weight: bold; font-size: 1.1rem; }
-        .stat-box { text-align: center; padding: 15px; background: #e9ecef; border-radius: 8px; margin-bottom: 15px; }
-        .stat-val { font-size: 2rem; font-weight: bold; color: #0d6efd; display: block; line-height: 1; }
-
-        /* Pantalla de Carga */
+        .check-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+        .alert-falta { border-left: 5px solid #dc3545; background: #fff5f5; color: #dc3545; padding: 10px; margin-bottom: 8px; font-weight: bold; border-radius: 4px; }
         #loader { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:9999; align-items:center; justify-content:center; flex-direction:column; }
     </style>
 </head>
@@ -34,33 +19,31 @@
 
 <div id="loader">
     <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div>
-    <h4 class="mt-3 text-primary fw-bold">Procesando...</h4>
-    <p class="text-muted small">Subiendo evidencia y guardando datos</p>
+    <h5 class="mt-3 fw-bold">Conectando...</h5>
 </div>
 
 <div class="container">
-    <ul class="nav nav-pills nav-fill mb-4 p-2 bg-white rounded-3 shadow-sm">
+    <ul class="nav nav-pills nav-fill mb-4 main-card p-2">
         <li class="nav-item">
             <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-registro">📝 REGISTRO</button>
         </li>
         <li class="nav-item">
-            <button class="nav-link text-danger fw-bold" data-bs-toggle="pill" data-bs-target="#tab-control" onclick="calcularFaltas()">👮 CONTROL DE FALTAS</button>
+            <button class="nav-link text-danger" data-bs-toggle="pill" data-bs-target="#tab-control" onclick="cargarControl()">👮 CONTROL DE FALTAS</button>
         </li>
     </ul>
 
     <div class="tab-content">
-        
         <div class="tab-pane fade show active" id="tab-registro">
-            <div class="contenedor">
-                <h3 class="text-center fw-bold mb-4" style="color: #0d6efd;">Cierre Diario</h3>
+            <div class="main-card">
+                <h3 class="text-center text-primary fw-bold mb-4">Cierre Diario</h3>
                 
                 <div class="mb-3">
                     <label class="fw-bold">Responsable:</label>
-                    <input type="text" id="nombre" class="form-control form-control-lg" placeholder="Nombre completo">
+                    <input type="text" id="nombre" class="form-control form-control-lg" placeholder="Tu nombre completo">
                 </div>
 
-                <div class="card p-3 border-0 bg-light mb-4">
-                    <h6 class="text-muted fw-bold border-bottom pb-2">Checklist Operativo</h6>
+                <div class="card p-3 border-0 bg-light mb-3">
+                    <h6 class="text-muted border-bottom pb-2 fw-bold">Checklist</h6>
                     <div class="check-item"><span>🐶 Pitbull en unidades</span><input type="checkbox" id="c1" class="form-check-input"></div>
                     <div class="check-item"><span>🚗 Unidades cerradas</span><input type="checkbox" id="c2" class="form-check-input"></div>
                     <div class="check-item"><span>🔒 Candados Bodega</span><input type="checkbox" id="c3" class="form-check-input"></div>
@@ -70,28 +53,151 @@
                 </div>
 
                 <div class="mb-4">
-                    <label class="fw-bold">📸 Evidencia (Fotos):</label>
+                    <label class="fw-bold">Fotos:</label>
                     <input type="file" id="fotos" multiple accept="image/*" class="form-control">
                 </div>
 
-                <button class="btn btn-primary w-100 py-3 fw-bold shadow" onclick="enviarReporte()">ENVIAR REPORTE</button>
+                <button class="btn btn-primary w-100 py-3 fw-bold shadow-sm" onclick="enviarReporte()">ENVIAR REPORTE</button>
             </div>
         </div>
 
         <div class="tab-pane fade" id="tab-control">
-            <div class="contenedor">
-                <h4 class="text-center fw-bold text-danger mb-4">Auditoría de Cierres</h4>
+            <div class="main-card">
+                <h4 class="text-center fw-bold text-danger mb-4">Auditoría de Asistencia</h4>
                 
-                <div class="stat-box">
-                    <span class="stat-val" id="totalMes">...</span>
-                    <small>Cierres realizados este mes</small>
+                <div id="status" class="alert alert-info text-center">Cargando datos...</div>
+                
+                <div id="panel-faltas" style="display:none;">
+                    <h6 class="text-danger fw-bold border-bottom pb-2">⚠️ DÍAS SIN CIERRE (Lunes a Viernes):</h6>
+                    <div id="lista-faltas-container"></div>
                 </div>
 
-                <div id="loadingControl" class="text-center text-muted my-4">Analizando calendario...</div>
+                <div id="panel-ok" class="alert alert-success text-center mt-3" style="display:none;">
+                    ✅ ¡Excelente! No hay faltas registradas este mes.
+                </div>
 
-                <div id="panelFaltas" style="display:none;">
-                    <h6 class="fw-bold text-danger border-bottom pb-2 mb-3">⚠️ DÍAS LABORALES SIN CIERRE:</h6>
-                    <div id="listaFaltasContainer"></div>
-                    <div class="alert alert-warning mt-3 small">
-                        <i class="fas fa-exclamation-triangle"></i> 
-                        Estas fechas corresponden a días <b>Lunes a Viernes</b> donde
+                <button class="btn btn-outline-secondary w-100 mt-4" onclick="cargarControl()">🔄 Actualizar Datos</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- TU NUEVA URL (VERSIÓN 18) ---
+    const API_URL = "https://script.google.com/macros/s/AKfycbwfGS1-SGtGlCdntx5Zv8NPWRIMNjy4BrmI9VldOB9_f1F7v_nFEIOC3Zbqh9H07VaBuw/exec";
+
+    async function enviarReporte() {
+        const nom = document.getElementById('nombre').value;
+        if(!nom) return alert("⚠️ Por favor, escribe tu nombre.");
+        
+        document.getElementById('loader').style.display = 'flex';
+
+        // Procesar fotos
+        const inputFiles = document.getElementById('fotos').files;
+        let fotosData = [];
+        
+        if(inputFiles.length > 0) {
+            for(let f of inputFiles) {
+                try {
+                    let b64 = await new Promise(r => {
+                        let reader = new FileReader();
+                        reader.onload = e => r({data: e.target.result, mimeType: f.type});
+                        reader.readAsDataURL(f);
+                    });
+                    fotosData.push(b64);
+                } catch(e) { console.error("Error foto"); }
+            }
+        }
+
+        const data = {
+            responsable: nom,
+            checks: {
+                p1: document.getElementById('c1').checked ? "SI" : "NO",
+                p2: document.getElementById('c2').checked ? "SI" : "NO",
+                p3: document.getElementById('c3').checked ? "SI" : "NO",
+                p4: document.getElementById('c4').checked ? "SI" : "NO",
+                p5: document.getElementById('c5').checked ? "SI" : "NO",
+                p6: document.getElementById('c6').checked ? "SI" : "NO"
+            },
+            fotos: fotosData
+        };
+
+        try {
+            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+            alert("✅ Reporte enviado correctamente.");
+            window.location.reload();
+        } catch(e) {
+            alert("❌ Error de conexión. Intenta nuevamente.");
+            document.getElementById('loader').style.display = 'none';
+        }
+    }
+
+    async function cargarControl() {
+        try {
+            const res = await fetch(API_URL);
+            const registros = await res.json();
+            
+            // Convertir fechas del Excel a texto simple
+            const fechasHechas = registros.map(r => new Date(r.fecha).toLocaleDateString());
+            
+            let hoy = new Date();
+            let mesActual = hoy.getMonth();
+            let anioActual = hoy.getFullYear();
+            let faltas = [];
+            let contadorMes = 0;
+
+            // Contar total del mes
+            registros.forEach(r => {
+                let d = new Date(r.fecha);
+                if(d.getMonth() === mesActual && d.getFullYear() === anioActual) contadorMes++;
+            });
+            document.getElementById('status').innerText = "Cierres registrados este mes: " + contadorMes;
+
+            // Buscar días faltantes (Lun a Vie)
+            let iter = new Date(anioActual, mesActual, 1);
+            
+            // Revisar hasta ayer (o hasta hoy si quieres ser estricto)
+            while(iter <= hoy) {
+                let diaSem = iter.getDay(); // 0=Dom, 6=Sab
+                
+                // Si es día laboral (1 a 5)
+                if(diaSem >= 1 && diaSem <= 5) {
+                    let fechaStr = iter.toLocaleDateString();
+                    
+                    // Si no está en la lista de registros
+                    if(!fechasHechas.includes(fechaStr)) {
+                        // Opcional: No marcar HOY como falta si aun es temprano. 
+                        // Quitamos esta condición para que marque todo lo que falte.
+                        if(fechaStr !== hoy.toLocaleDateString()) {
+                            let textoFecha = iter.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+                            faltas.push(textoFecha.charAt(0).toUpperCase() + textoFecha.slice(1));
+                        }
+                    }
+                }
+                iter.setDate(iter.getDate() + 1);
+            }
+
+            // Mostrar resultados
+            const divLista = document.getElementById('lista-faltas-container');
+            divLista.innerHTML = "";
+            
+            if(faltas.length > 0) {
+                document.getElementById('panel-faltas').style.display = 'block';
+                document.getElementById('panel-ok').style.display = 'none';
+                faltas.forEach(f => {
+                    divLista.innerHTML += `<div class="alert-falta">❌ ${f}</div>`;
+                });
+            } else {
+                document.getElementById('panel-faltas').style.display = 'none';
+                document.getElementById('panel-ok').style.display = 'block';
+            }
+
+        } catch(e) {
+            console.error(e);
+            document.getElementById('status').innerText = "Error cargando datos. Verifica tu conexión.";
+        }
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
