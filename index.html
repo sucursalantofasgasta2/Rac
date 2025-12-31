@@ -3,78 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rent a Car - Sistema de Cierre</title>
+    <title>Reporte Diario - Rent a Car</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
         body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; padding: 20px; }
-        .contenedor-principal { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 600px; margin: auto; }
-        .titulo-app { color: #0d6efd; font-weight: bold; text-align: center; margin-bottom: 20px; text-transform: uppercase; }
-        .item-check { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; padding: 12px 0; }
-        .btn-enviar { width: 100%; padding: 15px; font-size: 1.1rem; font-weight: bold; margin-top: 25px; border-radius: 10px; }
-        #overlay-carga { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:9999; align-items:center; justify-content:center; flex-direction:column; }
+        .main-container { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 600px; margin: auto; }
+        .header-title { color: #0d6efd; font-weight: bold; text-align: center; margin-bottom: 20px; }
+        .check-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f1f1; padding: 12px 0; }
+        .check-item:last-child { border-bottom: none; }
+        .btn-submit { width: 100%; padding: 14px; font-size: 1.1rem; font-weight: bold; margin-top: 25px; border-radius: 8px; }
+        
+        /* Pantalla de carga */
+        #loader { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:9999; align-items:center; justify-content:center; flex-direction:column; }
     </style>
 </head>
 <body>
 
-<div id="overlay-carga">
+<div id="loader">
     <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div>
     <h4 class="mt-3 text-primary fw-bold">Guardando reporte...</h4>
-    <p class="text-muted">Subiendo fotos y datos al Excel</p>
+    <p class="text-muted">Subiendo fotos y actualizando Excel</p>
 </div>
 
 <div class="container">
-    <ul class="nav nav-pills nav-fill mb-4 contenedor-principal p-2">
+    <ul class="nav nav-pills nav-fill mb-4 main-container p-2">
         <li class="nav-item">
-            <button class="nav-link active fw-bold" data-bs-toggle="pill" data-bs-target="#panel-registro">📝 REGISTRO</button>
+            <button class="nav-link active fw-bold" data-bs-toggle="pill" data-bs-target="#tab-registro">📝 NUEVO REPORTE</button>
         </li>
         <li class="nav-item">
-            <button class="nav-link fw-bold" data-bs-toggle="pill" data-bs-target="#panel-stats" onclick="cargarEstadisticas()">📊 ESTADÍSTICAS</button>
+            <button class="nav-link fw-bold" data-bs-toggle="pill" data-bs-target="#tab-stats" onclick="cargarGrafico()">📊 ESTADÍSTICAS</button>
         </li>
     </ul>
 
     <div class="tab-content">
         
-        <div class="tab-pane fade show active" id="panel-registro">
-            <div class="contenedor-principal">
-                <h3 class="titulo-app">Nuevo Cierre</h3>
+        <div class="tab-pane fade show active" id="tab-registro">
+            <div class="main-container">
+                <h3 class="header-title">Cierre de Operaciones</h3>
                 
-                <div class="mb-4">
-                    <label class="form-label fw-bold">Nombre del Responsable:</label>
-                    <input type="text" id="campoNombre" class="form-control form-control-lg" placeholder="Ej: Mohammed" required>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Responsable:</label>
+                    <input type="text" id="inputNombre" class="form-control form-control-lg" placeholder="Escribe tu nombre" required>
                 </div>
 
-                <h6 class="text-muted fw-bold border-bottom pb-2">Checklist Operativo</h6>
-                <div class="item-check"><span>🐶 Pitbull en unidades</span><input type="checkbox" id="chk1" class="form-check-input" style="transform: scale(1.3);"></div>
-                <div class="item-check"><span>🚗 Unidades cerradas</span><input type="checkbox" id="chk2" class="form-check-input" style="transform: scale(1.3);"></div>
-                <div class="item-check"><span>🔒 Candados Bodegas</span><input type="checkbox" id="chk3" class="form-check-input" style="transform: scale(1.3);"></div>
-                <div class="item-check"><span>⛽ Estación Combustible</span><input type="checkbox" id="chk4" class="form-check-input" style="transform: scale(1.3);"></div>
-                <div class="item-check"><span>🗑️ Basura Lavado</span><input type="checkbox" id="chk5" class="form-check-input" style="transform: scale(1.3);"></div>
-                <div class="item-check"><span>🧹 Patio Ordenado</span><input type="checkbox" id="chk6" class="form-check-input" style="transform: scale(1.3);"></div>
+                <div class="card bg-light border-0 p-3 mb-3">
+                    <h6 class="text-muted fw-bold mb-2">Checklist Diario</h6>
+                    <div class="check-item"><span>🐶 Pitbull en unidades</span><input type="checkbox" id="chk1" class="form-check-input" style="transform: scale(1.3);"></div>
+                    <div class="check-item"><span>🚗 Unidades cerradas</span><input type="checkbox" id="chk2" class="form-check-input" style="transform: scale(1.3);"></div>
+                    <div class="check-item"><span>🔒 Candados Bodegas</span><input type="checkbox" id="chk3" class="form-check-input" style="transform: scale(1.3);"></div>
+                    <div class="check-item"><span>⛽ Estación Combustible</span><input type="checkbox" id="chk4" class="form-check-input" style="transform: scale(1.3);"></div>
+                    <div class="check-item"><span>🗑️ Basura Lavado</span><input type="checkbox" id="chk5" class="form-check-input" style="transform: scale(1.3);"></div>
+                    <div class="check-item"><span>🧹 Patio Ordenado</span><input type="checkbox" id="chk6" class="form-check-input" style="transform: scale(1.3);"></div>
+                </div>
 
-                <div class="mt-4">
+                <div class="mb-3">
                     <label class="form-label fw-bold">📸 Evidencia (Fotos):</label>
-                    <input type="file" id="campoFotos" multiple accept="image/*" class="form-control">
-                    <small class="text-muted">Puedes seleccionar varias fotos a la vez.</small>
+                    <input type="file" id="inputFotos" multiple accept="image/*" class="form-control">
+                    <div class="form-text">Puedes subir varias fotos a la vez.</div>
                 </div>
 
-                <button class="btn btn-primary btn-enviar shadow" onclick="procesarEnvio()">ENVIAR AHORA</button>
+                <button class="btn btn-primary btn-submit shadow-sm" onclick="enviarFormulario()">ENVIAR REPORTE</button>
             </div>
         </div>
 
-        <div class="tab-pane fade" id="panel-stats">
-            <div class="contenedor-principal text-center">
-                <h3 class="titulo-app">Reporte Semanal</h3>
-                <canvas id="graficoBarras"></canvas>
+        <div class="tab-pane fade" id="tab-stats">
+            <div class="main-container text-center">
+                <h3 class="header-title">Resumen Semanal</h3>
+                <canvas id="miGrafico"></canvas>
                 <hr class="my-4">
-                <h6 class="text-start fw-bold">Últimos Registros:</h6>
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover text-start" id="tabla-registros">
-                        <thead class="table-light"><tr><th>Fecha</th><th>Responsable</th></tr></thead>
+                    <table class="table table-sm text-start" id="tablaLogs">
+                        <thead class="table-light"><tr><th>Fecha</th><th>Usuario</th></tr></thead>
                         <tbody><tr><td colspan="2">Cargando datos...</td></tr></tbody>
                     </table>
                 </div>
-                <button class="btn btn-outline-primary btn-sm mt-2" onclick="cargarEstadisticas()">🔄 Actualizar</button>
+                <button class="btn btn-outline-primary btn-sm mt-3" onclick="cargarGrafico()">🔄 Actualizar datos</button>
             </div>
         </div>
 
@@ -82,40 +87,39 @@
 </div>
 
 <script>
-    // --- TU URL YA ESTÁ PEGADA AQUÍ ---
-    const API_URL = "https://script.google.com/macros/s/AKfycbx2NThfv5Ob1_ZOk8qHb04hXMhve0VFXKvKPgLGhqFWKH4VHy_jTkaikrqWetDsOAQutA/exec";
-    // ----------------------------------
+    // --- TU URL OFICIAL ---
+    const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbyBwqPLbAgJPEzQeiPkj1F0OsmW5xyJ77MYvmyQnNmT2xw9fY94ICyNQ4hz3MA6gBh8bw/exec";
+    // ----------------------
 
-    async function procesarEnvio() {
-        let nombre = document.getElementById('campoNombre').value;
-        if (!nombre) return alert("⚠️ Por favor, escribe tu nombre antes de enviar.");
+    async function enviarFormulario() {
+        const nombre = document.getElementById('inputNombre').value;
+        if (!nombre) return alert("⚠️ ¡Oye! Olvidaste poner tu nombre.");
 
-        // Activar pantalla de carga
-        document.getElementById('overlay-carga').style.display = 'flex';
+        // Mostrar pantalla de carga
+        document.getElementById('loader').style.display = 'flex';
 
-        // 1. Convertir Fotos a Base64
-        let inputFiles = document.getElementById('campoFotos');
+        // 1. Convertir fotos a Base64
+        const archivos = document.getElementById('inputFotos').files;
         let fotosData = [];
         
-        if (inputFiles.files.length > 0) {
-            for (let i = 0; i < inputFiles.files.length; i++) {
-                let file = inputFiles.files[i];
+        if (archivos.length > 0) {
+            for (let i = 0; i < archivos.length; i++) {
+                let file = archivos[i];
                 try {
-                    let base64 = await new Promise((resolve, reject) => {
+                    let base64 = await new Promise((resolve) => {
                         let reader = new FileReader();
                         reader.onload = (e) => resolve({ data: e.target.result, mimeType: file.type });
-                        reader.onerror = reject;
                         reader.readAsDataURL(file);
                     });
                     fotosData.push(base64);
-                } catch (e) {
-                    console.error("Error leyendo foto", e);
+                } catch (err) {
+                    console.error("Error leyendo foto", err);
                 }
             }
         }
 
-        // 2. Preparar el paquete de datos
-        let datos = {
+        // 2. Armar el paquete de datos
+        const paquete = {
             responsable: nombre,
             checks: {
                 p1: document.getElementById('chk1').checked ? "SI" : "NO",
@@ -128,42 +132,40 @@
             fotos: fotosData
         };
 
-        // 3. Enviar a Google
+        // 3. Enviar a Google Script
         try {
-            await fetch(API_URL, {
+            await fetch(GOOGLE_URL, {
                 method: 'POST',
-                mode: 'no-cors', // Necesario para evitar bloqueos de navegador
-                body: JSON.stringify(datos)
+                mode: 'no-cors', // Necesario para que el navegador no bloquee el envío
+                body: JSON.stringify(paquete)
             });
-            
-            // Como usamos no-cors, asumimos éxito si no hay error de red
-            alert("✅ ¡Reporte enviado con éxito!");
-            window.location.reload(); 
+
+            alert("✅ ¡Reporte enviado y guardado con éxito!");
+            window.location.reload(); // Recargar para limpiar
         } catch (error) {
             alert("❌ Error de conexión: " + error);
-            document.getElementById('overlay-carga').style.display = 'none';
+            document.getElementById('loader').style.display = 'none';
         }
     }
 
-    // Lógica para Estadísticas
-    let miGrafico = null;
+    // --- LÓGICA DEL GRÁFICO ---
+    let chartInstance = null;
 
-    async function cargarEstadisticas() {
+    async function cargarGrafico() {
         try {
-            let respuesta = await fetch(API_URL); // Petición GET normal
-            let datos = await respuesta.json();
+            const response = await fetch(GOOGLE_URL);
+            const datos = await response.json();
             
-            // Llenar la tabla
-            let tbody = document.querySelector("#tabla-registros tbody");
+            const tbody = document.querySelector("#tablaLogs tbody");
             tbody.innerHTML = "";
             
-            let conteoDias = [0,0,0,0,0,0,0]; // Domingo a Sábado
+            let conteoSemana = [0,0,0,0,0,0,0]; // Dom - Sab
 
-            // Mostrar solo los últimos 10 y procesar para el gráfico
+            // Mostrar solo los últimos 10 registros
             datos.slice().reverse().slice(0, 10).forEach(fila => {
                 let fecha = new Date(fila.fecha);
                 if (!isNaN(fecha)) {
-                    conteoDias[fecha.getDay()]++;
+                    conteoSemana[fecha.getDay()]++;
                     tbody.innerHTML += `<tr>
                         <td>${fecha.toLocaleDateString()}</td>
                         <td>${fila.responsable}</td>
@@ -171,22 +173,19 @@
                 }
             });
 
-            // Si no hay datos
-            if(datos.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='2'>No hay registros aún.</td></tr>";
-            }
+            if (datos.length === 0) tbody.innerHTML = "<tr><td colspan='2'>No hay registros.</td></tr>";
 
-            // Dibujar/Actualizar Gráfico
-            let ctx = document.getElementById('graficoBarras');
-            if (miGrafico) miGrafico.destroy();
+            // Dibujar gráfico
+            const ctx = document.getElementById('miGrafico');
+            if (chartInstance) chartInstance.destroy();
 
-            miGrafico = new Chart(ctx, {
+            chartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'],
+                    labels: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
                     datasets: [{
-                        label: 'Cierres Realizados',
-                        data: conteoDias,
+                        label: 'Reportes Entregados',
+                        data: conteoSemana,
                         backgroundColor: '#0d6efd',
                         borderRadius: 5
                     }]
@@ -200,7 +199,7 @@
 
         } catch (e) {
             console.error(e);
-            document.querySelector("#tabla-registros tbody").innerHTML = "<tr><td colspan='2' class='text-danger'>Error cargando datos. Revisa la consola.</td></tr>";
+            document.querySelector("#tablaLogs tbody").innerHTML = "<tr><td colspan='2' class='text-danger'>Error cargando estadísticas.</td></tr>";
         }
     }
 </script>
